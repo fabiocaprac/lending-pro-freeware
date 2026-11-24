@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a self-contained macOS launcher for Lending Pro Freeware."""
+"""Build a self-contained macOS launcher for Prazo Certo."""
 
 import os
 import shutil
@@ -8,10 +8,10 @@ import subprocess
 import sys
 
 
-APP_NAME = "Lending Pro Freeware"
+APP_NAME = "Prazo Certo"
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 APP_DEST = os.path.expanduser(f"~/Applications/{APP_NAME}.app")
-RUNTIME_DIR = os.path.expanduser("~/Library/Application Support/PH-Lending/runtime")
+RUNTIME_DIR = os.path.expanduser("~/Library/Application Support/PrazoCerto/runtime")
 RUNTIME_PYTHON = os.path.join(RUNTIME_DIR, "bin", "python")
 ICNS_PATH = os.path.join(PROJECT_DIR, "icon.icns")
 REQUIREMENTS_PATH = os.path.join(PROJECT_DIR, "requirements.txt")
@@ -88,17 +88,17 @@ def create_app():
     launcher_content = """#!/bin/bash
 APP_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 APP_CODE="$APP_ROOT/Resources/app"
-PYTHON="$HOME/Library/Application Support/PH-Lending/runtime/bin/python"
+PYTHON="$HOME/Library/Application Support/PrazoCerto/runtime/bin/python"
 LOG_DIR="$HOME/Library/Logs"
 mkdir -p "$LOG_DIR"
 
 if [ ! -x "$PYTHON" ]; then
-    echo "PH-Lending local runtime is missing. Run create_app_launcher.py again." >> "$LOG_DIR/PH-Lending.log"
+    echo "O runtime local do Prazo Certo está ausente. Execute create_app_launcher.py novamente." >> "$LOG_DIR/PrazoCerto.log"
     exit 1
 fi
 
 cd "$APP_CODE" || exit 1
-exec "$PYTHON" "$APP_CODE/main.py" >> "$LOG_DIR/PH-Lending.log" 2>&1
+exec "$PYTHON" "$APP_CODE/main.py" >> "$LOG_DIR/PrazoCerto.log" 2>&1
 """
     with open(launcher_path, "w", encoding="utf-8") as launcher:
         launcher.write(launcher_content)
@@ -120,7 +120,7 @@ exec "$PYTHON" "$APP_CODE/main.py" >> "$LOG_DIR/PH-Lending.log" 2>&1
     <key>CFBundleIconFile</key>
     <string>icon</string>
     <key>CFBundleIdentifier</key>
-    <string>com.phlending.pro</string>
+    <string>com.prazocerto.app</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
@@ -136,9 +136,9 @@ exec "$PYTHON" "$APP_CODE/main.py" >> "$LOG_DIR/PH-Lending.log" 2>&1
     <key>NSHighResolutionCapable</key>
     <true/>
     <key>NSCameraUsageDescription</key>
-    <string>Lending Pro Freeware uses the camera to capture client photos.</string>
+    <string>O Prazo Certo usa a câmera para fotografar clientes e documentos.</string>
     <key>NSPhotoLibraryUsageDescription</key>
-    <string>Lending Pro Freeware imports client documents selected by the user.</string>
+    <string>O Prazo Certo importa documentos escolhidos pelo usuário.</string>
 </dict>
 </plist>
 """

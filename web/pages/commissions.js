@@ -1,5 +1,5 @@
 /**
- * Lending Pro Freeware — Referral Commissions Page
+ * Prazo Certo — Comissões de indicação Page
  */
 const CommissionsPage = {
     async render() {
@@ -13,13 +13,13 @@ const CommissionsPage = {
                         <i data-lucide="gift" class="w-5 h-5 text-amber-600 dark:text-amber-400"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-gray-800 dark:text-white">Referral Commissions</h3>
+                        <h3 class="font-bold text-gray-800 dark:text-white">Comissões de indicação</h3>
                         <p class="text-xs text-gray-400 dark:text-slate-500">${commissions.length} commissions tracked</p>
                     </div>
                 </div>
             </div>
 
-            ${commissions.length === 0 ? UI.emptyState('gift', 'No Referral Commissions', 'Commissions are automatically generated when a referred client takes a loan.') : `
+            ${commissions.length === 0 ? UI.emptyState('gift', 'Nenhuma comissão', 'A comissão surge quando um cliente indicado fecha um empréstimo.') : `
                 <!-- Summary -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 stagger">
                     ${UI.statCard('gift', 'Total Commissions',

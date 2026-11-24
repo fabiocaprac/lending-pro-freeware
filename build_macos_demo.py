@@ -12,8 +12,8 @@ import sys
 
 
 PROJECT_DIR = Path(__file__).resolve().parent
-APP_NAME = "Lending Pro Freeware"
-DMG_VOLUME_NAME = "Lending Pro Freeware Installer"
+APP_NAME = "Prazo Certo"
+DMG_VOLUME_NAME = "Instalador Prazo Certo"
 BUNDLE_ID = "com.phlending.pro.demo"
 ARCHITECTURE = "arm64"
 BUILD_DIR = PROJECT_DIR / "build" / "macos-demo"
@@ -135,8 +135,8 @@ def build_app():
         "CFBundleShortVersionString": "1.5.1",
         "CFBundleVersion": "8",
         "LSMinimumSystemVersion": "12.0",
-        "NSCameraUsageDescription": "Lending Pro Freeware uses the camera to capture client photos.",
-        "NSPhotoLibraryUsageDescription": "Lending Pro Freeware imports files selected by the user.",
+        "NSCameraUsageDescription": "O Prazo Certo usa a câmera para fotografar clientes e documentos.",
+        "NSPhotoLibraryUsageDescription": "O Prazo Certo importa arquivos escolhidos pelo usuário.",
     })
     with info_path.open("wb") as handle:
         plistlib.dump(info, handle, sort_keys=True)

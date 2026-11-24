@@ -1,5 +1,5 @@
 /**
- * Lending Pro Freeware — All Payments Page (Enhanced)
+ * Prazo Certo — All Payments Page (Enhanced)
  * Shows payment history with: loan amount, paid total, remaining balance, months remaining.
  */
 const PaymentsPage = {
@@ -77,8 +77,8 @@ const PaymentsPage = {
         }
 
         if (filtered.length === 0) {
-            container.innerHTML = UI.emptyState('receipt', 'No Payments Found',
-                this.filterClient || this.filterMonth ? 'No payments match your filters.' : 'No payments have been recorded yet.'
+            container.innerHTML = UI.emptyState('receipt', 'Nenhum pagamento encontrado',
+                this.filterClient || this.filterMonth ? 'Nenhum pagamento neste filtro.' : 'Ainda não há pagamentos registrados.'
             );
             lucide.createIcons();
             return;
@@ -248,13 +248,15 @@ const PaymentsPage = {
     _methodBadge(method) {
         const badges = {
             cash: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
-            gcash: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
+            pix: 'bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300',
+            gcash: 'bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300',
             bank_transfer: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300',
+            boleto: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
+            card: 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300',
             check: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300',
         };
         const cls = badges[method] || 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300';
-        const label = (method || 'cash').replace('_', ' ');
-        return `<span class="px-2 py-0.5 rounded-full text-xs font-medium capitalize ${cls}">${label}</span>`;
+        return `<span class="px-2 py-0.5 rounded-full text-xs font-medium ${cls}">${UI.paymentMethodLabel(method)}</span>`;
     },
 
     onSearch(val) {
@@ -308,7 +310,7 @@ const PaymentsPage = {
                     <input id="void-payment-reason" class="input" placeholder="Example: duplicate entry" autocomplete="off">
                 </div>
                 <div class="flex gap-3 justify-end pt-2">
-                    <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button>
+                    <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button>
                     <button onclick="PaymentsPage.submitVoidPayment(${paymentId})" class="btn btn-danger">
                         <i data-lucide="undo-2" class="w-4 h-4"></i> Void Payment
                     </button>

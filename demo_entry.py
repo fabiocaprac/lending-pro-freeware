@@ -6,8 +6,8 @@ import os
 
 os.environ.setdefault("PH_LENDING_DEMO_ONLY", "1")
 # Keep the existing data folder for backward-compatible upgrades.
-os.environ.setdefault("PH_LENDING_APP_NAME", "Lending Pro Freeware")
-os.environ.setdefault("PH_LENDING_DATA_FOLDER", "PH-Lending Demo")
+os.environ.setdefault("PH_LENDING_APP_NAME", "Prazo Certo")
+os.environ.setdefault("PH_LENDING_DATA_FOLDER", "PrazoCerto Demo")
 
 from main import main
 

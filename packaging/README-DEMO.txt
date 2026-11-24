@@ -1,20 +1,20 @@
-Lending Pro Freeware - macOS Apple Silicon
+Prazo Certo — macOS Apple Silicon
 
-Installation
-1. Open the DMG.
-2. Drag Lending Pro Freeware into Applications.
-3. Open the app from Applications.
+Instalação
+1. Abra o DMG.
+2. Arraste o Prazo Certo para Aplicativos.
+3. Abra o app em Aplicativos.
 
-The app starts with a new empty personal database. Click "Try demo" in
-the top-right toolbar to temporarily load fictitious data. Leaving the demo or
-restarting the app returns to the personal database.
+O app começa com um banco pessoal vazio. Clique em "Testar demo" na
+barra superior para carregar dados fictícios. Sair da demo ou reiniciar
+volta aos seus dados.
 
-The demo and personal databases stay isolated in:
-~/Library/Application Support/PH-Lending Demo
+Os bancos de demo e pessoal ficam em:
+~/Library/Application Support/PrazoCerto Demo
 
-The Quit App button closes the window and its local background server.
+O botão Sair fecha a janela e o servidor local.
 
-Important
-- Compatible with Apple Silicon Macs (M1, M2, M3, M4 and newer).
-- The app is ad-hoc signed, not notarized with an Apple Developer account.
-- If macOS blocks the first launch, Control-click the app, choose Open, then confirm Open.
+Importante
+- Compatível com Macs Apple Silicon (M1, M2, M3, M4 e mais novos).
+- O app é assinado ad-hoc, sem notarização da Apple.
+- Se o macOS bloquear a primeira abertura, clique com a tecla Control, escolha Abrir e confirme.

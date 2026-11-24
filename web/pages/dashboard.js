@@ -1,5 +1,5 @@
 /**
- * Lending Pro Freeware — Dashboard Page
+ * Prazo Certo — Dashboard Page
  */
 const DashboardPage = {
     async render() {
@@ -18,22 +18,22 @@ const DashboardPage = {
         content.innerHTML = `
             <!-- Stats Grid -->
             <div class="dashboard-stats grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 stagger">
-                ${UI.statCard('banknote', 'Active Capital', UI.formatCurrency(stats.active_capital), 'blue', `${stats.active_loans} active loans`)}
-                ${UI.statCard('trending-up', 'Interest Collected', UI.formatCurrency(stats.interest_collected), 'green', 'Payments plus upfront interest')}
-                ${UI.statCard('alert-triangle', 'Default Rate', stats.delinquency_rate + '%', 'red', `${stats.defaulted_loans} defaulted loans`)}
-                ${UI.statCard('users', 'Total Clients', stats.client_count, 'purple', `${stats.active_loans} active borrowers`)}
+                ${UI.statCard('banknote', 'Capital ativo', UI.formatCurrency(stats.active_capital), 'blue', `${stats.active_loans} empréstimos ativos`)}
+                ${UI.statCard('trending-up', 'Juros recebidos', UI.formatCurrency(stats.interest_collected), 'green', 'Pagamentos e juros antecipados')}
+                ${UI.statCard('alert-triangle', 'Inadimplência', stats.delinquency_rate + '%', 'red', `${stats.defaulted_loans} contratos inadimplentes`)}
+                ${UI.statCard('users', 'Total de clientes', stats.client_count, 'purple', `${stats.active_loans} clientes com contrato ativo`)}
             </div>
 
             <!-- Risk & Yield -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 stagger">
                 ${UI.statCard('shield-alert', 'PAR 30', `${Number(stats.par_30 || 0).toFixed(2)}%`, (stats.par_30 || 0) > 10 ? 'red' : 'amber', `${UI.formatCurrency((stats.aging_buckets?.['31_60'] || 0) + (stats.aging_buckets?.['61_90'] || 0) + (stats.aging_buckets?.['90_plus'] || 0))} at risk`)}
-                ${UI.statCard('chart-no-axes-combined', 'Average Effective APR', `${Number(stats.average_taeg || 0).toFixed(2)}%`, 'purple', 'Weighted by active principal')}
-                ${UI.statCard('badge-percent', 'Portfolio Yield', `${Number(stats.effective_yield || 0).toFixed(2)}%`, 'green', `${UI.formatCurrency(stats.fee_income || 0)} fees recorded`)}
-                ${UI.statCard('life-buoy', 'Default Recovery', `${Number(stats.post_default_recovery_rate || 0).toFixed(2)}%`, 'blue', `${UI.formatCurrency(stats.post_default_recovered || 0)} recovered`)}
+                ${UI.statCard('chart-no-axes-combined', 'CET médio', `${Number(stats.average_taeg || 0).toFixed(2)}%`, 'purple', 'Ponderado pelo principal ativo')}
+                ${UI.statCard('badge-percent', 'Rentabilidade da carteira', `${Number(stats.effective_yield || 0).toFixed(2)}%`, 'green', `${UI.formatCurrency(stats.fee_income || 0)} taxas registradas`)}
+                ${UI.statCard('life-buoy', 'Recuperação pós-inadimplência', `${Number(stats.post_default_recovery_rate || 0).toFixed(2)}%`, 'blue', `${UI.formatCurrency(stats.post_default_recovered || 0)} recovered`)}
             </div>
 
             <div class="glass-card p-5 mb-6">
-                <div class="flex items-center justify-between mb-4"><h3 class="font-bold">Portfolio Aging</h3><span class="text-xs" style="color:var(--text-tertiary)">Outstanding principal: ${UI.formatCurrency(stats.gross_outstanding_principal || 0)}</span></div>
+                <div class="flex items-center justify-between mb-4"><h3 class="font-bold">Envelhecimento da carteira</h3><span class="text-xs" style="color:var(--text-tertiary)">Principal em aberto: ${UI.formatCurrency(stats.gross_outstanding_principal || 0)}</span></div>
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
                     ${[['Current','current','#34C759'],['1–30 days','1_30','#FFCC00'],['31–60 days','31_60','#FF9500'],['61–90 days','61_90','#FF3B30'],['90+ days','90_plus','#AF1E2D']].map(([label,key,color]) => `
                         <div class="rounded-xl p-3" style="background:var(--surface-2); border-top:3px solid ${color};">
@@ -42,29 +42,10 @@ const DashboardPage = {
                 </div>
             </div>
 
-            <div class="mb-5 flex items-center justify-between gap-4 flex-wrap px-4 py-3 rounded-lg"
-                 style="background:rgba(255,149,0,0.08); border:1px solid rgba(255,149,0,0.20);">
-                <div class="flex items-center gap-3 min-w-0">
-                    <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-                         style="background:rgba(255,149,0,0.14); color:#B86700;">
-                        <i data-lucide="coffee" class="w-5 h-5"></i>
-                    </div>
-                    <div class="min-w-0">
-                        <p class="text-sm font-semibold" style="color:var(--text-primary)">${I18n.x('support')}</p>
-                        <p class="text-xs" style="color:var(--text-tertiary)">${I18n.x('supportDescription')}</p>
-                    </div>
-                </div>
-                <button onclick="DonationSupport.show()" class="btn btn-sm flex items-center gap-1.5"
-                        style="background:#B86700; color:white; border:1px solid #B86700;">
-                    <i data-lucide="coffee" class="w-3.5 h-3.5"></i>
-                    <span>Don</span>
-                </button>
-            </div>
-
             ${collectorPerformance?.length ? `<div class="glass-card p-5 mt-6">
-                <h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="route" class="w-5 h-5 text-blue-500"></i> Collector Performance</h3>
-                <div class="overflow-x-auto"><table class="data-table"><thead><tr><th>Collector</th><th>Loans</th><th>Managed</th><th>Collected</th><th>Overdue</th><th>Avg. APR</th></tr></thead><tbody>
-                    ${collectorPerformance.map(c => `<tr><td><span class="font-semibold">${c.name}</span>${!c.active ? '<span class="ml-2 text-xs text-gray-400">Inactive</span>' : ''}</td><td>${c.active_loans || 0} active / ${c.loan_count || 0}</td><td>${UI.formatCurrency(c.principal_managed || 0)}</td><td class="text-green-600">${UI.formatCurrency(c.collected || 0)}</td><td class="text-red-500">${UI.formatCurrency(c.overdue_amount || 0)}</td><td>${Number(c.average_taeg || 0).toFixed(2)}%</td></tr>`).join('')}
+                <h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="route" class="w-5 h-5 text-blue-500"></i> Desempenho dos cobradores</h3>
+                <div class="overflow-x-auto"><table class="data-table"><thead><tr><th>Cobrador</th><th>Contratos</th><th>Carteira</th><th>Recebido</th><th>Em atraso</th><th>CET médio</th></tr></thead><tbody>
+                    ${collectorPerformance.map(c => `<tr><td><span class="font-semibold">${c.name}</span>${!c.active ? '<span class="ml-2 text-xs text-gray-400">Inativo</span>' : ''}</td><td>${c.active_loans || 0} ativos / ${c.loan_count || 0}</td><td>${UI.formatCurrency(c.principal_managed || 0)}</td><td class="text-green-600">${UI.formatCurrency(c.collected || 0)}</td><td class="text-red-500">${UI.formatCurrency(c.overdue_amount || 0)}</td><td>${Number(c.average_taeg || 0).toFixed(2)}%</td></tr>`).join('')}
                 </tbody></table></div>
             </div>` : ''}
 
@@ -80,19 +61,19 @@ const DashboardPage = {
                         </div>
                         <div>
                             <p class="font-bold text-sm" style="color:#FF3B30">
-                                ${overdueAlerts.length} client${overdueAlerts.length > 1 ? 's' : ''} with overdue payment${overdueAlerts.length > 1 ? 's' : ''}
+                                ${overdueAlerts.length} client${overdueAlerts.length > 1 ? 's' : ''} com parcela em atraso${overdueAlerts.length > 1 ? 's' : ''}
                                 ${criticalCount > 0 ? `— <span style="color:#FF2D55">${criticalCount} critical${criticalCount > 1 ? '' : ''}</span>` : ''}
                             </p>
                             <p class="text-xs" style="color:var(--text-tertiary)">
                                 Total due: ${UI.formatCurrency(overdueAlerts.reduce((s, a) => s + a.total_overdue_amount, 0))}
-                                • Click to view alerts and send SMS
+                                • Abra os alertas para enviar SMS
                             </p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
                         <span class="text-xs px-3 py-1 rounded-full font-semibold"
                               style="background:#FF3B30; color:white;">
-                            View Alerts →
+                            Ver alertas →
                         </span>
                     </div>
                 </div>
@@ -112,7 +93,7 @@ const DashboardPage = {
             </div>` : ''}
 
             <div class="dashboard-main-grid grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Today's Collections -->
+                <!-- Cobranças de hoje -->
                 <div class="lg:col-span-2 glass-card p-5">
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center gap-3">
@@ -120,7 +101,7 @@ const DashboardPage = {
                                 <i data-lucide="calendar-check" class="w-5 h-5 text-amber-600 dark:text-amber-400"></i>
                             </div>
                             <div>
-                                <h3 class="font-bold text-gray-800 dark:text-white">Today's Collections</h3>
+                                <h3 class="font-bold text-gray-800 dark:text-white">Cobranças de hoje</h3>
                                 <p class="text-xs text-gray-400 dark:text-slate-500">${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>
                             </div>
                         </div>
@@ -130,7 +111,7 @@ const DashboardPage = {
                     ${collections.length === 0 ? `
                         <div class="text-center py-8">
                             <i data-lucide="check-circle" class="w-10 h-10 text-green-400 mx-auto mb-2"></i>
-                            <p class="text-gray-400 dark:text-slate-500">No collections due today</p>
+                            <p class="text-gray-400 dark:text-slate-500">Nenhuma cobrança vence hoje</p>
                         </div>
                     ` : `
                         <div class="space-y-2 max-h-80 overflow-y-auto">
@@ -148,36 +129,36 @@ const DashboardPage = {
                                     </div>
                                     <div class="text-right">
                                         <p class="font-bold text-sm text-gray-800 dark:text-white">${UI.formatCurrency(c.total_due)}</p>
-                                        <p class="text-xs text-gray-400 dark:text-slate-500">${c.contact || 'No contact'}</p>
+                                        <p class="text-xs text-gray-400 dark:text-slate-500">${c.contact || 'Sem telefone'}</p>
                                     </div>
                                 </div>
                             `).join('')}
                         </div>
                         <div class="mt-3 pt-3 border-t border-gray-100 dark:border-slate-700/50 flex justify-between items-center">
-                            <span class="text-sm text-gray-500 dark:text-slate-400">Total Expected</span>
+                            <span class="text-sm text-gray-500 dark:text-slate-400">Total previsto</span>
                             <span class="font-bold text-lg text-amber-600 dark:text-amber-400">${UI.formatCurrency(stats.today_amount)}</span>
                         </div>
                     `}
                 </div>
 
-                <!-- Recent Payments -->
+                <!-- Últimos pagamentos -->
                 <div class="glass-card p-5">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="p-2 bg-green-100 dark:bg-green-900/30 rounded-xl">
                             <i data-lucide="trending-up" class="w-5 h-5 text-green-600 dark:text-green-400"></i>
                         </div>
-                        <h3 class="font-bold text-gray-800 dark:text-white">Recent Payments</h3>
+                        <h3 class="font-bold text-gray-800 dark:text-white">Últimos pagamentos</h3>
                     </div>
                     
                     ${recentPayments.length === 0 ? `
-                        <p class="text-center text-gray-400 dark:text-slate-500 py-8 text-sm">No payments recorded yet</p>
+                        <p class="text-center text-gray-400 dark:text-slate-500 py-8 text-sm">Nenhum pagamento registrado</p>
                     ` : `
                         <div class="space-y-3">
                             ${recentPayments.map(p => `
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <p class="text-sm font-medium text-gray-700 dark:text-slate-300">${p.first_name} ${p.last_name}</p>
-                                        <p class="text-xs text-gray-400 dark:text-slate-500">${UI.formatDate(p.payment_date)} • ${(p.payment_method || 'cash').replace('_', ' ').toUpperCase()}</p>
+                                        <p class="text-xs text-gray-400 dark:text-slate-500">${UI.formatDate(p.payment_date)} • ${UI.paymentMethodLabel(p.payment_method)}</p>
                                     </div>
                                     <span class="text-sm font-bold text-green-600 dark:text-green-400">+${UI.formatCurrency(p.amount)}</span>
                                 </div>
@@ -194,8 +175,8 @@ const DashboardPage = {
                         <i data-lucide="calendar" class="w-5 h-5 text-blue-600 dark:text-blue-400"></i>
                     </div>
                     <div>
-                        <p class="text-sm font-semibold text-gray-800 dark:text-white">Collection Calendar</p>
-                        <p class="text-xs text-gray-400 dark:text-slate-500">View upcoming collections →</p>
+                        <p class="text-sm font-semibold text-gray-800 dark:text-white">Agenda de cobrança</p>
+                        <p class="text-xs text-gray-400 dark:text-slate-500">Ver próxima cobrança →</p>
                     </div>
                 </div>
                 <div class="glass-card p-4 flex items-center gap-4 cursor-pointer" onclick="App.navigate('alerts')"
@@ -208,7 +189,7 @@ const DashboardPage = {
                             Alerts
                             ${overdueAlerts.length > 0 ? `<span class="ml-1 text-xs font-bold px-1.5 py-0.5 rounded-full text-white" style="background:#FF3B30">${overdueAlerts.length}</span>` : ''}
                         </p>
-                        <p class="text-xs text-gray-400 dark:text-slate-500">Overdue & SMS →</p>
+                        <p class="text-xs text-gray-400 dark:text-slate-500">Atrasos e SMS →</p>
                     </div>
                 </div>
                 <div class="glass-card p-4 flex items-center gap-4 cursor-pointer" onclick="App.navigate('settings')">
@@ -216,8 +197,8 @@ const DashboardPage = {
                         <i data-lucide="download" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i>
                     </div>
                     <div>
-                        <p class="text-sm font-semibold text-gray-800 dark:text-white">Export Data</p>
-                        <p class="text-xs text-gray-400 dark:text-slate-500">Excel, backup, sync →</p>
+                        <p class="text-sm font-semibold text-gray-800 dark:text-white">Exportar dados</p>
+                        <p class="text-xs text-gray-400 dark:text-slate-500">Excel, backup, sincronização →</p>
                     </div>
                 </div>
                 <div class="glass-card p-4 flex items-center gap-4 cursor-pointer" onclick="App.navigate('commissions')">
@@ -225,8 +206,8 @@ const DashboardPage = {
                         <i data-lucide="gift" class="w-5 h-5 text-amber-600 dark:text-amber-400"></i>
                     </div>
                     <div>
-                        <p class="text-sm font-semibold text-gray-800 dark:text-white">Referral Commissions</p>
-                        <p class="text-xs text-gray-400 dark:text-slate-500">Track referrals →</p>
+                        <p class="text-sm font-semibold text-gray-800 dark:text-white">Comissões de indicação</p>
+                        <p class="text-xs text-gray-400 dark:text-slate-500">Ver indicações →</p>
                     </div>
                 </div>
             </div>

@@ -1,5 +1,5 @@
 /**
- * Lending Pro Freeware — Alerts Page
+ * Prazo Certo — Alerts Page
  * Overdue payment alerts + SMS notification system.
  * Dual-mode SMS: iPhone connected to Mac (Continuity) OR API (Semaphore/Twilio)
  */
@@ -57,7 +57,7 @@ const AlertsPage = {
                     <button onclick="AlertsPage.sendBulkSMS()" class="btn btn-sm"
                         style="background:#17845b; color:white;">
                         <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
-                        Bulk SMS
+                        SMS em lote
                     </button>` : ''}
                 </div>
             </div>
@@ -95,10 +95,10 @@ const AlertsPage = {
             if (alerts.length === 0) {
                 return UI.emptyState(
                     'check-circle-2',
-                    'No overdue payments!',
-                    'All your clients are up to date. Great job!',
+                    'Nenhuma parcela em atraso!',
+                    'Todos os clientes estão em dia.',
                     `<button onclick="App.navigate('dashboard')" class="btn btn-primary">
-                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Painel
                     </button>`
                 );
             }
@@ -195,7 +195,7 @@ const AlertsPage = {
                                 </button>` : `
                                 <span class="opacity-40">
                                     <i data-lucide="phone-off" class="w-3 h-3 inline-block mr-1 opacity-60"></i>
-                                    No contact info
+                                    Sem telefone info
                                 </span>`}
                             </div>
                         </div>
@@ -207,7 +207,7 @@ const AlertsPage = {
                         ${hasPhone ? `
                         <button onclick="AlertsPage.openSmsModal(${alertIndex})"
                             class="btn btn-sm btn-primary flex items-center gap-1.5">
-                            <i data-lucide="send" class="w-3.5 h-3.5"></i> Send SMS
+                            <i data-lucide="send" class="w-3.5 h-3.5"></i> Enviar SMS
                         </button>
                         <button onclick="AlertsPage._callPhone('${a.contact}')"
                             class="btn btn-sm btn-ghost flex items-center gap-1.5">
@@ -274,7 +274,7 @@ const AlertsPage = {
 
         const firstTemplate = templates.length > 0 ? fillTemplate(templates[0].text) : '';
 
-        UI.showModal(`Send SMS to ${alert.first_name} ${alert.last_name}`, `
+        UI.showModal(`Enviar SMS to ${alert.first_name} ${alert.last_name}`, `
             <div class="space-y-4">
                 <!-- Client info strip -->
                 <div class="flex items-center gap-3 p-3 rounded-xl"
@@ -369,7 +369,7 @@ const AlertsPage = {
 
                 <!-- Action buttons -->
                 <div class="flex gap-3 justify-end pt-2" style="border-top: 0.5px solid var(--surface-2);">
-                    <button onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button>
+                    <button onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button>
                     <button onclick="AlertsPage._sendSms()"
                         class="btn btn-primary flex items-center gap-2">
                         <i data-lucide="send" class="w-4 h-4"></i>
@@ -474,7 +474,7 @@ const AlertsPage = {
         }
 
         UI.closeModal();
-        UI.toast('Sending SMS…', 'info');
+        UI.toast('Enviando SMS…', 'info');
 
         let result;
         if (method === 'phone') {
@@ -512,7 +512,7 @@ const AlertsPage = {
         UI.toast(`Calling ${phone}...`, 'info');
     },
 
-    // ─── Bulk SMS ────────────────────────────────────────────────
+    // ─── SMS em lote ────────────────────────────────────────────────
     sendBulkSMS() {
         const filtered = this._filter === 'all'
             ? this._alerts
@@ -522,7 +522,7 @@ const AlertsPage = {
         const noPhone = filtered.length - withPhone.length;
         const templates = this._templates || [];
 
-        UI.showModal(`Bulk SMS — ${filtered.length} client${filtered.length > 1 ? 's' : ''}`, `
+        UI.showModal(`SMS em lote — ${filtered.length} client${filtered.length > 1 ? 's' : ''}`, `
             <div class="space-y-4">
                 <div class="p-3 rounded-xl" style="background: var(--surface-2);">
                     <p class="text-sm" style="color:var(--text-primary)">
@@ -574,7 +574,7 @@ const AlertsPage = {
                 </div>
 
                 <div class="flex gap-3 justify-end pt-2" style="border-top: 0.5px solid var(--surface-2);">
-                    <button onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button>
+                    <button onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button>
                     <button onclick="AlertsPage._sendBulk()" class="btn btn-primary">
                         <i data-lucide="send" class="w-4 h-4"></i>
                         Send to ${withPhone.length} client${withPhone.length > 1 ? 's' : ''}
@@ -594,7 +594,7 @@ const AlertsPage = {
         const companyPhone = settings.company_phone || '';
 
         if (!tpl) {
-            UI.toast('No template selected.', 'warning');
+            UI.toast('Nenhum modelo selecionado.', 'warning');
             return;
         }
 

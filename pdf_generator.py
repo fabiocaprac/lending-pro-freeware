@@ -1,6 +1,6 @@
 """
-Lending Pro Freeware — PDF Generator
-Generates loan contracts and payment receipts using reportlab.
+Prazo Certo — gerador de PDF
+Contratos, recibos e carnês de amortização.
 """
 
 import os
@@ -19,7 +19,14 @@ from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
 
 from app_config import APP_NAME
 from database import get_connection, dict_from_row, rows_to_list, APP_SUPPORT_DIR
-from currency_utils import format_money, normalize_currency
+from currency_utils import (
+    DEFAULT_CURRENCY,
+    format_cpf,
+    format_date_br,
+    format_money,
+    format_payment_method,
+    normalize_currency,
+)
 
 
 def _get_styles():
@@ -82,7 +89,7 @@ def _get_company_info():
         'name': info.get('company_name', APP_NAME),
         'address': info.get('company_address', ''),
         'contact': info.get('company_contact', ''),
-        'currency': normalize_currency(info.get('currency', 'PHP')),
+        'currency': normalize_currency(info.get('currency', DEFAULT_CURRENCY)),
     }
 
 
@@ -153,23 +160,24 @@ def generate_contract_pdf(loan_id, output_path=None):
     elements.append(Spacer(1, 6*mm))
     elements.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#cbd5e1')))
     elements.append(Spacer(1, 4*mm))
-    elements.append(Paragraph("LOAN AGREEMENT / CONTRACT", styles['DocTitle']))
+    elements.append(Paragraph("CONTRATO DE EMPRÉSTIMO", styles['DocTitle']))
     elements.append(Spacer(1, 4*mm))
 
     # Contract date
     elements.append(Paragraph(
-        f"Date: {datetime.now().strftime('%B %d, %Y')}",
+        f"Data: {datetime.now().strftime('%d/%m/%Y')}",
         styles['Normal']
     ))
     elements.append(Spacer(1, 4*mm))
 
     # Client information
-    elements.append(Paragraph("BORROWER INFORMATION", styles['SectionHeader']))
+    elements.append(Paragraph("DADOS DO CLIENTE", styles['SectionHeader']))
     client_data = [
-        ["Client ID:", client['id'], "Name:", f"{client['first_name']} {client['last_name']}"],
-        ["Address:", client['address'], "Contact:", client['contact']],
-        ["ID Number:", client.get('id_number') or "—", "Date of Birth:", client.get('date_of_birth') or "—"],
-        ["Employer:", client.get('employer') or "—", "Occupation:", client.get('occupation') or "—"],
+        ["Código:", client['id'], "Nome:", f"{client['first_name']} {client['last_name']}"],
+        ["Endereço:", client['address'], "Telefone:", client['contact']],
+        ["CPF:", format_cpf(client.get('cpf')) or "—", "RG / documento:", client.get('id_number') or "—"],
+        ["Nascimento:", format_date_br(client.get('date_of_birth')), "Ocupação:", client.get('occupation') or "—"],
+        ["Empregador:", client.get('employer') or "—", "", ""],
     ]
     client_table = Table(client_data, colWidths=[70, 160, 70, 160])
     client_table.setStyle(TableStyle([
@@ -186,22 +194,34 @@ def generate_contract_pdf(loan_id, output_path=None):
     elements.append(Spacer(1, 4*mm))
 
     # Loan details
-    elements.append(Paragraph("LOAN DETAILS", styles['SectionHeader']))
-    interest_label = "Fixed" if loan['interest_type'] == 'fixed' else "Declining Balance"
+    elements.append(Paragraph("DADOS DO EMPRÉSTIMO", styles['SectionHeader']))
+    interest_label = "Prefixado" if loan['interest_type'] == 'fixed' else "Saldo decrescente"
     term_rate = float(loan['interest_rate'])
     original_term = int(loan.get('original_term_months') or loan['term_months'])
     monthly_rate = term_rate / max(original_term, 1)
     total_repayment = float(loan.get('total_repayment') or 0) or (float(loan['principal']) + float(loan['total_interest']))
-    frequency = str(loan.get('repayment_frequency') or 'monthly').replace('biweekly', 'Every 2 weeks').title()
+    frequency_map = {
+        "daily": "Diária",
+        "weekly": "Semanal",
+        "biweekly": "Quinzenal",
+        "monthly": "Mensal",
+    }
+    frequency = frequency_map.get(str(loan.get('repayment_frequency') or 'monthly'), 'Mensal')
+    status_map = {
+        "active": "Ativo",
+        "paid": "Quitado",
+        "defaulted": "Inadimplente",
+        "refinanced": "Renegociado",
+    }
     loan_data = [
-        ["Principal Amount:", format_money(loan['principal'], company['currency']), "Monthly Rate:", f"{monthly_rate:.2f}%"],
-        ["Interest Type:", interest_label, "Term Rate:", f"{term_rate:.2f}%"],
-        ["Term:", f"{loan['term_months']} months", "Frequency:", frequency],
-        ["Installment:", format_money(loan.get('installment_amount') or loan['monthly_payment'], company['currency']), "Installments:", str(loan.get('installment_count') or len(schedule))],
-        ["Total Interest:", format_money(loan['total_interest'], company['currency']), "Total Repayment:", format_money(total_repayment, company['currency'])],
-        ["Processing Fee:", format_money(loan.get('processing_fee') or 0, company['currency']), "Insurance Fee:", format_money(loan.get('insurance_fee') or 0, company['currency'])],
-        ["Net Disbursed:", format_money(loan.get('disbursed_amount') or loan['principal'], company['currency']), "Effective APR:", f"{float(loan.get('taeg') or 0):.2f}%"],
-        ["Start Date:", loan['start_date'], "Status:", loan['status'].upper()],
+        ["Valor principal:", format_money(loan['principal'], company['currency']), "Juros ao mês:", f"{monthly_rate:.2f}%"],
+        ["Tipo de juros:", interest_label, "Taxa no prazo:", f"{term_rate:.2f}%"],
+        ["Prazo:", f"{loan['term_months']} meses", "Frequência:", frequency],
+        ["Parcela:", format_money(loan.get('installment_amount') or loan['monthly_payment'], company['currency']), "Nº de parcelas:", str(loan.get('installment_count') or len(schedule))],
+        ["Juros totais:", format_money(loan['total_interest'], company['currency']), "Total a pagar:", format_money(total_repayment, company['currency'])],
+        ["Taxa de cadastro:", format_money(loan.get('processing_fee') or 0, company['currency']), "Seguro:", format_money(loan.get('insurance_fee') or 0, company['currency'])],
+        ["Valor liberado:", format_money(loan.get('disbursed_amount') or loan['principal'], company['currency']), "CET / APR:", f"{float(loan.get('taeg') or 0):.2f}%"],
+        ["Início:", format_date_br(loan['start_date']), "Situação:", status_map.get(loan['status'], loan['status'])],
     ]
     loan_table = Table(loan_data, colWidths=[100, 130, 100, 130])
     loan_table.setStyle(TableStyle([
@@ -218,13 +238,13 @@ def generate_contract_pdf(loan_id, output_path=None):
     elements.append(Spacer(1, 6*mm))
 
     # Amortization schedule
-    elements.append(Paragraph("AMORTIZATION SCHEDULE", styles['SectionHeader']))
-    amort_header = ["#", "Due Date", "Principal", "Interest", "Total Due", "Balance"]
+    elements.append(Paragraph("CARNÊ / TABELA DE AMORTIZAÇÃO", styles['SectionHeader']))
+    amort_header = ["#", "Vencimento", "Principal", "Juros", "Parcela", "Saldo"]
     amort_data = [amort_header]
     for entry in schedule:
         amort_data.append([
             str(entry['month_number']),
-            entry['due_date'],
+            format_date_br(entry['due_date']),
             format_money(entry['principal_portion'], company['currency']),
             format_money(entry['interest_portion'], company['currency']),
             format_money(entry['total_due'], company['currency']),
@@ -249,8 +269,8 @@ def generate_contract_pdf(loan_id, output_path=None):
     elements.append(Spacer(1, 10*mm))
 
     if guarantors:
-        elements.append(Paragraph("GUARANTORS / CO-MAKERS", styles['SectionHeader']))
-        guarantor_data = [["Name", "Contact", "Relationship", "ID Number"]]
+        elements.append(Paragraph("FIADORES", styles['SectionHeader']))
+        guarantor_data = [["Nome", "Telefone", "Parentesco", "Documento"]]
         guarantor_data.extend([[g['name'], g.get('contact') or "—", g.get('relation') or "—", g.get('id_number') or "—"] for g in guarantors])
         guarantor_table = Table(guarantor_data, colWidths=[130, 110, 110, 110])
         guarantor_table.setStyle(TableStyle([
@@ -265,8 +285,8 @@ def generate_contract_pdf(loan_id, output_path=None):
         elements.append(Spacer(1, 6*mm))
 
     if collateral_items:
-        elements.append(Paragraph("COLLATERAL", styles['SectionHeader']))
-        collateral_data = [["Description", "Type", "Estimated Value", "Serial / Plate", "Status"]]
+        elements.append(Paragraph("GARANTIAS", styles['SectionHeader']))
+        collateral_data = [["Descrição", "Tipo", "Valor estimado", "Série / placa", "Situação"]]
         collateral_data.extend([[
             item['description'], str(item.get('collateral_type') or 'other').replace('_', ' ').title(),
             format_money(item.get('estimated_value') or 0, company['currency']),
@@ -285,12 +305,12 @@ def generate_contract_pdf(loan_id, output_path=None):
         elements.append(Spacer(1, 6*mm))
 
     # Terms
-    elements.append(Paragraph("TERMS AND CONDITIONS", styles['SectionHeader']))
+    elements.append(Paragraph("CONDIÇÕES GERAIS", styles['SectionHeader']))
     terms = [
-        "1. The borrower agrees to repay the loan according to the amortization schedule above.",
-        "2. Late payments may incur additional charges as agreed upon.",
-        f"3. The borrower acknowledges net loan proceeds of {format_money(loan.get('disbursed_amount') or loan['principal'], company['currency'])} after disclosed deductions.",
-        "4. This agreement is binding upon signature by both parties.",
+        "1. O cliente se compromete a pagar o empréstimo conforme o carnê acima.",
+        "2. Atraso no pagamento pode gerar multa e juros de mora, conforme combinado.",
+        f"3. O cliente declara ter recebido {format_money(loan.get('disbursed_amount') or loan['principal'], company['currency'])} líquidos após as taxas informadas.",
+        "4. Este contrato vale a partir da assinatura das partes.",
     ]
     for t in terms:
         elements.append(Paragraph(t, styles['Normal']))
@@ -301,7 +321,7 @@ def generate_contract_pdf(loan_id, output_path=None):
     # Signature lines
     sig_data = [
         ["_________________________", "", "_________________________"],
-        ["Borrower's Signature", "", "Lender's Signature"],
+        ["Assinatura do cliente", "", "Assinatura do credor"],
         [f"{client['first_name']} {client['last_name']}", "", company['name']],
     ]
     sig_table = Table(sig_data, colWidths=[180, 100, 180])
@@ -326,7 +346,7 @@ def generate_contract_pdf(loan_id, output_path=None):
                     signature_mark = "_________________________"
             guarantor_signatures.extend([
                 [signature_mark],
-                ["Guarantor / Co-maker Signature"],
+                ["Assinatura do fiador"],
                 [guarantor['name']],
             ])
         guarantor_sig_table = Table(guarantor_signatures, colWidths=[220])
@@ -413,14 +433,14 @@ def generate_receipt_pdf(payment_id, output_path=None):
     elements.append(Spacer(1, 3*mm))
     elements.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#cbd5e1')))
     elements.append(Spacer(1, 4*mm))
-    elements.append(Paragraph("OFFICIAL PAYMENT RECEIPT", styles['DocTitle']))
+    elements.append(Paragraph("RECIBO DE PAGAMENTO", styles['DocTitle']))
     elements.append(Spacer(1, 6*mm))
 
     # Receipt info
     info_data = [
-        ["Receipt No:", f"RCT-{payment['id']:06d}", "Date:", payment['payment_date']],
-        ["Client ID:", client['id'], "Name:", f"{client['first_name']} {client['last_name']}"],
-        ["Loan ID:", str(loan['id']), "Method:", payment['payment_method'].upper()],
+        ["Recibo nº:", f"RCT-{payment['id']:06d}", "Data:", format_date_br(payment['payment_date'])],
+        ["Código:", client['id'], "Nome:", f"{client['first_name']} {client['last_name']}"],
+        ["Empréstimo:", str(loan['id']), "Forma:", format_payment_method(payment['payment_method'])],
     ]
     info_table = Table(info_data, colWidths=[80, 150, 60, 150])
     info_table.setStyle(TableStyle([
@@ -437,12 +457,12 @@ def generate_receipt_pdf(payment_id, output_path=None):
     elements.append(Spacer(1, 8*mm))
 
     # Payment summary
-    elements.append(Paragraph("PAYMENT SUMMARY", styles['SectionHeader']))
+    elements.append(Paragraph("RESUMO DO PAGAMENTO", styles['SectionHeader']))
     summary_data = [
-        ["Amount Paid:", format_money(payment['amount'], company['currency'])],
-        ["Total Loan Amount:", format_money(total_due, company['currency'])],
-        ["Total Paid to Date:", format_money(total_paid, company['currency'])],
-        ["Remaining Balance:", format_money(remaining, company['currency'])],
+        ["Valor pago:", format_money(payment['amount'], company['currency'])],
+        ["Total do empréstimo:", format_money(total_due, company['currency'])],
+        ["Total pago até hoje:", format_money(total_paid, company['currency'])],
+        ["Saldo restante:", format_money(remaining, company['currency'])],
     ]
     summary_table = Table(summary_data, colWidths=[180, 180])
     summary_table.setStyle(TableStyle([
@@ -459,17 +479,17 @@ def generate_receipt_pdf(payment_id, output_path=None):
 
     if payment['notes']:
         elements.append(Spacer(1, 4*mm))
-        elements.append(Paragraph(f"Notes: {payment['notes']}", styles['Normal']))
+        elements.append(Paragraph(f"Observações: {payment['notes']}", styles['Normal']))
 
     elements.append(Spacer(1, 20*mm))
 
     # Signature
     elements.append(Paragraph("_________________________", styles['Normal']))
-    elements.append(Paragraph("Authorized Signature", styles['FieldLabel']))
+    elements.append(Paragraph("Assinatura autorizada", styles['FieldLabel']))
 
     elements.append(Spacer(1, 10*mm))
     elements.append(Paragraph(
-        f"This receipt was generated on {datetime.now().strftime('%B %d, %Y at %I:%M %p')}",
+        f"Recibo gerado em {datetime.now().strftime('%d/%m/%Y às %H:%M')}",
         styles['SmallText']
     ))
 
@@ -550,11 +570,11 @@ def generate_amortization_pdf(loan_id, output_path=None):
     elements.append(Spacer(1, 2*mm))
     elements.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#cbd5e1')))
     elements.append(Spacer(1, 3*mm))
-    elements.append(Paragraph("AMORTIZATION SCHEDULE", styles['DocTitle']))
+    elements.append(Paragraph("CARNÊ / TABELA DE AMORTIZAÇÃO", styles['DocTitle']))
     elements.append(Spacer(1, 3*mm))
 
     # ─── Loan Summary ─────────────────────────────────────────────
-    interest_label = "Fixed Rate" if loan['interest_type'] == 'fixed' else "Declining Balance"
+    interest_label = "Prefixado" if loan['interest_type'] == 'fixed' else "Saldo decrescente"
     term_rate = float(loan['interest_rate'])
     original_term = int(loan.get('original_term_months') or loan['term_months'])
     monthly_rate = term_rate / max(original_term, 1)
@@ -562,34 +582,34 @@ def generate_amortization_pdf(loan_id, output_path=None):
 
     summary_data = [
         [
-            Paragraph("<b>Client:</b>", styles['FieldLabel']),
+            Paragraph("<b>Cliente:</b>", styles['FieldLabel']),
             Paragraph(f"<b>{client['first_name']} {client['last_name']}</b> ({client['id']})", styles['FieldValue']),
-            Paragraph("<b>Loan #:</b>", styles['FieldLabel']),
+            Paragraph("<b>Empréstimo nº:</b>", styles['FieldLabel']),
             Paragraph(f"<b>{loan['id']}</b>", styles['FieldValue']),
         ],
         [
             Paragraph("<b>Principal:</b>", styles['FieldLabel']),
             Paragraph(f"<b>{format_money(loan['principal'], company['currency'])}</b>", styles['FieldValue']),
-            Paragraph("<b>Interest Type:</b>", styles['FieldLabel']),
+            Paragraph("<b>Tipo de juros:</b>", styles['FieldLabel']),
             Paragraph(f"<b>{interest_label}</b>", styles['FieldValue']),
         ],
         [
-            Paragraph("<b>Monthly Rate:</b>", styles['FieldLabel']),
+            Paragraph("<b>Juros ao mês:</b>", styles['FieldLabel']),
             Paragraph(f"<b>{monthly_rate:.2f}%</b>", styles['FieldValue']),
-            Paragraph("<b>Term Rate:</b>", styles['FieldLabel']),
+            Paragraph("<b>Taxa no prazo:</b>", styles['FieldLabel']),
             Paragraph(f"<b>{term_rate:.2f}%</b>", styles['FieldValue']),
         ],
         [
-            Paragraph("<b>Total Due:</b>", styles['FieldLabel']),
+            Paragraph("<b>Total a pagar:</b>", styles['FieldLabel']),
             Paragraph(f"<b>{format_money(total_due_loan, company['currency'])}</b>", styles['FieldValue']),
-            Paragraph("<b>Total Paid:</b>", styles['FieldLabel']),
+            Paragraph("<b>Total pago:</b>", styles['FieldLabel']),
             Paragraph(f"<b>{format_money(total_paid, company['currency'])} ({pct_paid:.1f}%)</b>", styles['FieldValue']),
         ],
         [
-            Paragraph("<b>Remaining:</b>", styles['FieldLabel']),
+            Paragraph("<b>Saldo:</b>", styles['FieldLabel']),
             Paragraph(f"<b>{format_money(remaining_loan, company['currency'])}</b>", styles['FieldValue']),
-            Paragraph("<b>Term:</b>", styles['FieldLabel']),
-            Paragraph(f"<b>{loan['term_months']} months — {(loan.get('repayment_frequency') or 'monthly').replace('biweekly', 'every 2 weeks').title()} — Start: {loan['start_date']}</b>", styles['FieldValue']),
+            Paragraph("<b>Prazo:</b>", styles['FieldLabel']),
+            Paragraph(f"<b>{loan['term_months']} meses — início {format_date_br(loan['start_date'])}</b>", styles['FieldValue']),
         ],
     ]
     summary_table = Table(summary_data, colWidths=[65, 120, 65, 120])
@@ -608,10 +628,10 @@ def generate_amortization_pdf(loan_id, output_path=None):
 
     # ─── Color legend ─────────────────────────────────────────────
     legend_data = [[
-        Paragraph("■ Paid", ParagraphStyle('l1', parent=styles['SmallText'], textColor=colors.HexColor('#16a34a'))),
-        Paragraph("■ Overdue", ParagraphStyle('l2', parent=styles['SmallText'], textColor=colors.HexColor('#dc2626'))),
-        Paragraph("■ Today", ParagraphStyle('l3', parent=styles['SmallText'], textColor=colors.HexColor('#d97706'))),
-        Paragraph("■ Upcoming", ParagraphStyle('l4', parent=styles['SmallText'], textColor=colors.HexColor('#64748b'))),
+        Paragraph("■ Pago", ParagraphStyle('l1', parent=styles['SmallText'], textColor=colors.HexColor('#16a34a'))),
+        Paragraph("■ Atrasado", ParagraphStyle('l2', parent=styles['SmallText'], textColor=colors.HexColor('#dc2626'))),
+        Paragraph("■ Hoje", ParagraphStyle('l3', parent=styles['SmallText'], textColor=colors.HexColor('#d97706'))),
+        Paragraph("■ A vencer", ParagraphStyle('l4', parent=styles['SmallText'], textColor=colors.HexColor('#64748b'))),
     ]]
     legend_table = Table(legend_data, colWidths=[80, 80, 80, 80])
     legend_table.setStyle(TableStyle([
@@ -622,7 +642,7 @@ def generate_amortization_pdf(loan_id, output_path=None):
     elements.append(Spacer(1, 3*mm))
 
     # ─── Schedule Table ───────────────────────────────────────────
-    amort_header = ["#", "Due Date", "Principal", "Interest", "Total Due", "Balance", "Status"]
+    amort_header = ["#", "Vencimento", "Principal", "Juros", "Parcela", "Saldo", "Situação"]
     amort_data = [amort_header]
 
     cumulative_paid = 0
@@ -634,25 +654,25 @@ def generate_amortization_pdf(loan_id, output_path=None):
         is_overdue = is_past and not is_today and not is_paid and loan['status'] == 'active'
 
         if is_today:
-            status_text = "TODAY"
+            status_text = "HOJE"
             row_bg = colors.HexColor('#fffbeb')
             status_color = colors.HexColor('#d97706')
         elif is_paid:
-            status_text = "✓ PAID"
+            status_text = "✓ PAGO"
             row_bg = colors.HexColor('#f0fdf4')
             status_color = colors.HexColor('#16a34a')
         elif is_overdue:
-            status_text = "OVERDUE"
+            status_text = "ATRASADO"
             row_bg = colors.HexColor('#fff1f2')
             status_color = colors.HexColor('#dc2626')
         else:
-            status_text = "Upcoming"
+            status_text = "A vencer"
             row_bg = colors.white
             status_color = colors.HexColor('#94a3b8')
 
         amort_data.append([
             str(entry['month_number']),
-            entry['due_date'],
+            format_date_br(entry['due_date']),
             format_money(entry['principal_portion'], company['currency']),
             format_money(entry['interest_portion'], company['currency']),
             format_money(entry['total_due'], company['currency']),
@@ -715,7 +735,7 @@ def generate_amortization_pdf(loan_id, output_path=None):
     elements.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor('#e2e8f0')))
     elements.append(Spacer(1, 2*mm))
     elements.append(Paragraph(
-        f"Generated {datetime.now().strftime('%Y-%m-%d %H:%M')} - {APP_NAME}",
+        f"Gerado em {datetime.now().strftime('%d/%m/%Y %H:%M')} — {APP_NAME}",
         styles['SmallText']
     ))
 

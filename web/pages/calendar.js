@@ -1,5 +1,5 @@
 /**
- * Lending Pro Freeware — Collection Calendar Page
+ * Prazo Certo — Agenda de cobrança Page
  * Enhanced: Day-of-month filter, payment validation, monthly earnings.
  */
 const CalendarPage = {
@@ -80,14 +80,14 @@ const CalendarPage = {
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- LEFT PANEL -->
                 <div class="space-y-4">
-                    <!-- Today's Collections -->
+                    <!-- Cobranças de hoje -->
                     <div class="glass-card p-5">
                         <div class="flex items-center gap-3 mb-4">
                             <div class="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-xl">
                                 <i data-lucide="calendar-check" class="w-5 h-5 text-amber-600 dark:text-amber-400"></i>
                             </div>
                             <div>
-                                <h3 class="font-bold text-gray-800 dark:text-white">Today's Collections</h3>
+                                <h3 class="font-bold text-gray-800 dark:text-white">Cobranças de hoje</h3>
                                 <p class="text-xs text-gray-400 dark:text-slate-500">${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
                             </div>
                         </div>
@@ -95,7 +95,7 @@ const CalendarPage = {
                         ${todayCollections.length === 0 ? `
                             <div class="text-center py-6">
                                 <i data-lucide="check-circle" class="w-10 h-10 text-green-400 mx-auto mb-2"></i>
-                                <p class="text-sm text-gray-400 dark:text-slate-500">No collections due today!</p>
+                                <p class="text-sm text-gray-400 dark:text-slate-500">Nenhuma cobrança vence hoje!</p>
                             </div>
                         ` : `
                             <div class="space-y-2 max-h-[40vh] overflow-y-auto">
@@ -171,7 +171,7 @@ const CalendarPage = {
                             </div>
                         </div>
                         ${monthlyEarnings.length === 0 ? `
-                            <p class="text-sm text-gray-400 dark:text-slate-500 text-center py-4">No payments recorded yet</p>
+                            <p class="text-sm text-gray-400 dark:text-slate-500 text-center py-4">Nenhum pagamento registrado</p>
                         ` : `
                             <div class="space-y-2 max-h-64 overflow-y-auto">
                                 ${monthlyEarnings.map(m => {
@@ -323,7 +323,7 @@ const CalendarPage = {
         this.dayCollections = collections;
 
         if (collections.length === 0) {
-            container.innerHTML = `<p class="text-xs text-gray-400 dark:text-slate-500 text-center py-3">No active loans due on day ${day}</p>`;
+            container.innerHTML = `<p class="text-xs text-gray-400 dark:text-slate-500 text-center py-3">No empréstimos ativos due on day ${day}</p>`;
             return;
         }
 
@@ -374,7 +374,7 @@ const CalendarPage = {
 
     quickRecord(loanId, amount, clientName) {
         const today = new Date().toISOString().split('T')[0];
-        UI.showModal(`Record Payment — ${clientName}`, `
+        UI.showModal(`Registrar pagamento — ${clientName}`, `
             <form onsubmit="CalendarPage.submitQuickPayment(event, ${loanId})" class="space-y-4">
                 <div class="p-3 rounded-xl bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-800/30">
                     <p class="text-sm text-green-700 dark:text-green-400 font-medium">Loan #${loanId} — ${clientName}</p>
@@ -392,10 +392,7 @@ const CalendarPage = {
                 <div>
                     <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Method</label>
                     <select name="method" class="input select">
-                        <option value="cash">Cash</option>
-                        <option value="gcash">GCash</option>
-                        <option value="bank_transfer">Bank Transfer</option>
-                        <option value="check">Check</option>
+                        ${UI.paymentMethodOptions('cash')}
                     </select>
                 </div>
                 <div>
@@ -403,9 +400,9 @@ const CalendarPage = {
                     <input name="notes" class="input" placeholder="Optional notes...">
                 </div>
                 <div class="flex gap-3 justify-end pt-2">
-                    <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button>
+                    <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button>
                     <button type="submit" class="btn btn-success">
-                        <i data-lucide="check" class="w-4 h-4"></i> Confirm Payment
+                        <i data-lucide="check" class="w-4 h-4"></i> Confirmar pagamento
                     </button>
                 </div>
             </form>
@@ -473,16 +470,13 @@ const CalendarPage = {
                     <label class="text-sm font-medium text-gray-600 dark:text-slate-400">Payment Date</label>
                     <input id="bulk-pay-date" type="date" class="input flex-1" value="${today}">
                     <select id="bulk-pay-method" class="input select flex-1">
-                        <option value="cash">Cash</option>
-                        <option value="gcash">GCash</option>
-                        <option value="bank_transfer">Bank Transfer</option>
-                        <option value="check">Check</option>
+                        ${UI.paymentMethodOptions('cash')}
                     </select>
                 </div>
                 <div class="flex gap-3 justify-end">
-                    <button onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button>
+                    <button onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button>
                     <button onclick="CalendarPage.submitBulkPayments(${unique.length})" class="btn btn-success">
-                        <i data-lucide="check-circle" class="w-4 h-4"></i> Validate Selected
+                        <i data-lucide="check-circle" class="w-4 h-4"></i> Confirmar selecionados
                     </button>
                 </div>
             </div>

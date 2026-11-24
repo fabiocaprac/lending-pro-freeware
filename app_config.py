@@ -7,11 +7,12 @@ import sys
 DEMO_ONLY = os.environ.get("PH_LENDING_DEMO_ONLY", "0") == "1"
 APP_NAME = os.environ.get(
     "PH_LENDING_APP_NAME",
-    "Lending Pro Freeware",
+    "Prazo Certo",
 )
+APP_TAGLINE = "Gestão de crediário, empréstimos e cobrança"
 APP_DATA_FOLDER = os.environ.get(
     "PH_LENDING_DATA_FOLDER",
-    "PH-Lending Demo" if DEMO_ONLY else "PH-Lending",
+    "PrazoCerto Demo" if DEMO_ONLY else "PrazoCerto",
 )
 
 

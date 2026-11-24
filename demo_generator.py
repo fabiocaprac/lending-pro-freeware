@@ -72,7 +72,7 @@ def _add_payments(c, loan_id, monthly_payment, start_date_str, months_paid):
     for schedule in scheduled_payments:
         pay_date = schedule["due_date"]
         amount = float(schedule["total_due"])
-        method = random.choice(["cash", "gcash", "bank_transfer"])
+        method = random.choice(["cash", "pix", "bank_transfer", "boleto", "card"])
         c.execute("""
             INSERT INTO payments (loan_id, amount, payment_date, payment_method, notes, created_at)
             VALUES (?, ?, ?, ?, '', ?)
