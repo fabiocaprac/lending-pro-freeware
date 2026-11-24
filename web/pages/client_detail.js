@@ -1,5 +1,5 @@
 /**
- * Lending Pro Freeware — Client Detail Page
+ * Prazo Certo — Client Detail Page
  * Full client profile with photo, DTI, penalties, loans, documents, webcam, signature.
  */
 const ClientDetailPage = {
@@ -11,7 +11,7 @@ const ClientDetailPage = {
         const client = await App.api('get_client', clientId);
 
         if (!client) {
-            content.innerHTML = UI.emptyState('user-x', 'Client Not Found', 'This client does not exist.');
+            content.innerHTML = UI.emptyState('user-x', 'Cliente não encontrado', 'Este cliente não existe.');
             return;
         }
 
@@ -110,24 +110,25 @@ const ClientDetailPage = {
                                     <span class="font-medium text-right text-xs text-gray-700 dark:text-gray-200">${client.address || '—'}</span>
                                     ${client.address ? `
                                     <button onclick="ClientsPage.openMapForAddress('${(client.address || '').replace(/'/g, "\\'")}')"
-                                            class="text-blue-500 hover:text-blue-600 flex-shrink-0" title="View on map">
+                                            class="text-blue-500 hover:text-blue-600 flex-shrink-0" title="Ver no mapa">
                                         <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
                                     </button>` : ''}
                                 </div>
                             </div>
                             ${client.address_detail ? `<div class="flex justify-between"><span class="text-gray-500 dark:text-slate-300">Details</span><span class="font-medium text-right text-xs text-gray-500 dark:text-gray-400 italic max-w-[160px]">${client.address_detail}</span></div>` : ''}
                             <div class="flex justify-between">
-                                <span class="text-gray-500 dark:text-slate-300">Monthly Income</span>
-                                <span class="font-bold ${income === 0 ? 'text-gray-400 dark:text-slate-500' : 'text-gray-800 dark:text-gray-100'}">${income > 0 ? UI.formatCurrency(income) : 'Not set'}</span>
+                                <span class="text-gray-500 dark:text-slate-300">Renda mensal</span>
+                                <span class="font-bold ${income === 0 ? 'text-gray-400 dark:text-slate-500' : 'text-gray-800 dark:text-gray-100'}">${income > 0 ? UI.formatCurrency(income) : 'Não informado'}</span>
                             </div>
-                            ${client.id_number ? `<div class="flex justify-between"><span class="text-gray-500 dark:text-slate-300">ID Number</span><span class="font-medium text-right">${client.id_number}</span></div>` : ''}
-                            ${client.date_of_birth ? `<div class="flex justify-between"><span class="text-gray-500 dark:text-slate-300">Date of Birth</span><span class="font-medium">${UI.formatDate(client.date_of_birth)}${age !== null ? ` (${age})` : ''}</span></div>` : ''}
-                            ${client.employer ? `<div class="flex justify-between"><span class="text-gray-500 dark:text-slate-300">Employer</span><span class="font-medium text-right">${client.employer}</span></div>` : ''}
-                            ${client.occupation ? `<div class="flex justify-between"><span class="text-gray-500 dark:text-slate-300">Occupation</span><span class="font-medium text-right">${client.occupation}</span></div>` : ''}
-                            ${client.gender ? `<div class="flex justify-between"><span class="text-gray-500 dark:text-slate-300">Gender</span><span class="font-medium capitalize">${client.gender.replaceAll('_', ' ')}</span></div>` : ''}
+                            ${client.cpf ? `<div class="flex justify-between"><span class="text-gray-500 dark:text-slate-300">CPF</span><span class="font-medium text-right">${UI.formatCpf(client.cpf)}</span></div>` : ''}
+                            ${client.id_number ? `<div class="flex justify-between"><span class="text-gray-500 dark:text-slate-300">RG / documento</span><span class="font-medium text-right">${client.id_number}</span></div>` : ''}
+                            ${client.date_of_birth ? `<div class="flex justify-between"><span class="text-gray-500 dark:text-slate-300">Data de nascimento</span><span class="font-medium">${UI.formatDate(client.date_of_birth)}${age !== null ? ` (${age})` : ''}</span></div>` : ''}
+                            ${client.employer ? `<div class="flex justify-between"><span class="text-gray-500 dark:text-slate-300">Empregador</span><span class="font-medium text-right">${client.employer}</span></div>` : ''}
+                            ${client.occupation ? `<div class="flex justify-between"><span class="text-gray-500 dark:text-slate-300">Ocupação</span><span class="font-medium text-right">${client.occupation}</span></div>` : ''}
+                            ${client.gender ? `<div class="flex justify-between"><span class="text-gray-500 dark:text-slate-300">Gênero</span><span class="font-medium capitalize">${client.gender.replaceAll('_', ' ')}</span></div>` : ''}
                         </div>
                         <button onclick="ClientDetailPage.editClient()" class="btn btn-outline btn-sm w-full mt-3">
-                            <i data-lucide="edit-3" class="w-3 h-3"></i> Edit Profile
+                            <i data-lucide="edit-3" class="w-3 h-3"></i> Editar ficha
                         </button>
                     </div>
 
@@ -226,7 +227,7 @@ const ClientDetailPage = {
                                 </button>
                             </div>
                         </div>
-                        ${(client.loans || []).length === 0 ? UI.emptyState('banknote', 'No Loans', 'This client has no loans yet.') : `
+                        ${(client.loans || []).length === 0 ? UI.emptyState('banknote', 'Sem empréstimos', 'Este cliente ainda não tem contratos.') : `
                             <div class="space-y-3">
                                 ${client.loans.map(l => {
                 const totalDue = Number(l.total_repayment || (l.principal + l.total_interest));
@@ -459,48 +460,52 @@ const ClientDetailPage = {
             <form onsubmit="ClientDetailPage.saveEdit(event)" class="space-y-4">
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">First Name *</label>
+                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Nome *</label>
                         <input name="first_name" class="input" required id="edit-first-name">
                     </div>
                     <div>
-                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Last Name *</label>
+                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Sobrenome *</label>
                         <input name="last_name" class="input" required id="edit-last-name">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
-                    <div><label class="text-sm font-medium mb-1 block">ID Number</label><input name="id_number" id="edit-id-number" class="input"></div>
-                    <div><label class="text-sm font-medium mb-1 block">Date of Birth</label><input name="date_of_birth" id="edit-date-of-birth" type="date" class="input" max="${new Date().toISOString().split('T')[0]}"></div>
+                    <div><label class="text-sm font-medium mb-1 block">CPF</label><input name="cpf" id="edit-cpf" class="input" placeholder="000.000.000-00"></div>
+                    <div><label class="text-sm font-medium mb-1 block">RG / documento</label><input name="id_number" id="edit-id-number" class="input"></div>
+                </div>
+                <div>
+                    <label class="text-sm font-medium mb-1 block">Data de nascimento</label>
+                    <input name="date_of_birth" id="edit-date-of-birth" type="date" class="input" max="${new Date().toISOString().split('T')[0]}">
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div><label class="text-sm font-medium mb-1 block">Employer</label><input name="employer" id="edit-employer" class="input"></div>
-                    <div><label class="text-sm font-medium mb-1 block">Occupation</label><input name="occupation" id="edit-occupation" class="input"></div>
-                    <div><label class="text-sm font-medium mb-1 block">Gender</label><select name="gender" id="edit-gender" class="input select"><option value="">Not specified</option><option value="female">Female</option><option value="male">Male</option><option value="non_binary">Non-binary</option><option value="prefer_not_to_say">Prefer not to say</option></select></div>
+                    <div><label class="text-sm font-medium mb-1 block">Empregador</label><input name="employer" id="edit-employer" class="input"></div>
+                    <div><label class="text-sm font-medium mb-1 block">Ocupação</label><input name="occupation" id="edit-occupation" class="input"></div>
+                    <div><label class="text-sm font-medium mb-1 block">Gênero</label><select name="gender" id="edit-gender" class="input select"><option value="">Não informado</option><option value="female">Feminino</option><option value="male">Masculino</option><option value="non_binary">Não binário</option><option value="prefer_not_to_say">Prefiro não dizer</option></select></div>
                 </div>
                 <div>
                     <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Address</label>
                     <div class="flex gap-2">
                         <div class="relative flex-1">
-                            <input name="address" id="cdetail-address-input" class="input w-full" placeholder="Type to search address…"
+                            <input name="address" id="cdetail-address-input" class="input w-full" placeholder="Digite para buscar o endereço…"
                                    oninput="ClientsPage.searchAddress(this.value, 'cdetail-addr-results', 'cdetail-address-input')" autocomplete="off">
                             <div id="cdetail-addr-results" class="absolute z-50 w-full mt-1 rounded-xl overflow-hidden shadow-xl border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 hidden max-h-40 overflow-y-auto"></div>
                         </div>
-                        <button type="button" title="View on map" class="btn btn-ghost btn-icon flex-shrink-0 text-blue-500"
+                        <button type="button" title="Ver no mapa" class="btn btn-ghost btn-icon flex-shrink-0 text-blue-500"
                                 onclick="ClientsPage.openMapFromInput('cdetail-address-input')">
                             <i data-lucide="map-pin" class="w-4 h-4"></i>
                         </button>
                     </div>
                     <div class="mt-1.5">
-                        <input name="address_detail" id="edit-address-detail" class="input text-sm" placeholder="Unit / Floor / Landmark / Additional details…">
-                        <p class="text-xs text-gray-400 dark:text-slate-500 mt-0.5">Optional: apartment number, landmark, barangay details, etc.</p>
+                        <input name="address_detail" id="edit-address-detail" class="input text-sm" placeholder="Complemento, ponto de referência…">
+                        <p class="text-xs text-gray-400 dark:text-slate-500 mt-0.5">Opcional: apartamento, ponto de referência, bairro etc.</p>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Phone</label>
-                        <input name="contact" type="tel" class="input" placeholder="+41 79 123 45 67" id="edit-contact">
+                        <input name="contact" type="tel" class="input" placeholder="(11) 98765-4321" id="edit-contact">
                     </div>
                     <div>
-                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Monthly Income (${UI.currencyCode()})</label>
+                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Renda mensal (${UI.currencyCode()})</label>
                         <input name="monthly_income" type="number" step="0.01" min="0" inputmode="decimal" class="input" placeholder="0" id="edit-income">
                     </div>
                 </div>
@@ -530,7 +535,7 @@ const ClientDetailPage = {
                     <p class="text-[10px] text-gray-400 dark:text-slate-500 mt-1.5">Enter the username, not the full URL.</p>
                 </div>
                 <div class="flex gap-3 justify-end pt-2">
-                    <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button>
+                    <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button>
                     <button type="submit" class="btn btn-primary"><i data-lucide="save" class="w-4 h-4"></i> Save Changes</button>
                 </div>
             </form>
@@ -539,6 +544,7 @@ const ClientDetailPage = {
         App.api('get_client', this.clientId).then(c => {
             document.getElementById('edit-first-name').value = c.first_name || '';
             document.getElementById('edit-last-name').value = c.last_name || '';
+            document.getElementById('edit-cpf').value = c.cpf || '';
             document.getElementById('edit-id-number').value = c.id_number || '';
             document.getElementById('edit-date-of-birth').value = c.date_of_birth || '';
             document.getElementById('edit-employer').value = c.employer || '';
@@ -579,6 +585,7 @@ const ClientDetailPage = {
             email: form.email ? form.email.value : '',
             monthly_income: parseFloat(form.monthly_income.value) || 0,
             id_number: form.id_number.value,
+            cpf: form.cpf?.value || '',
             date_of_birth: form.date_of_birth.value,
             employer: form.employer.value,
             occupation: form.occupation.value,
@@ -587,11 +594,11 @@ const ClientDetailPage = {
             social_media: JSON.stringify(socialMedia)
         });
         if (result?.success === false) {
-            UI.toast(result.error || 'Could not update client.', 'error');
+            UI.toast(result.error || 'Não foi possível atualizar o cliente.', 'error');
             return;
         }
         UI.closeModal();
-        UI.toast('Client updated!', 'success');
+        UI.toast('Cliente atualizado.', 'success');
         this.render(this.clientId);
     },
 
@@ -599,7 +606,7 @@ const ClientDetailPage = {
         const today = new Date().toISOString().split('T')[0];
         const outstanding = Math.max(0, outstandingBalance || 0);
         const suggestedAmount = Math.min(monthlyPayment || outstanding, outstanding);
-        UI.showModal('Record Payment', `
+        UI.showModal('Registrar pagamento', `
             <form onsubmit="ClientDetailPage.submitQuickPayment(event, ${loanId})" class="space-y-4">
                 <div class="p-3 rounded-xl bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-800/30">
                     <p class="text-xs text-green-700 dark:text-green-400 flex items-center gap-1.5">
@@ -622,10 +629,7 @@ const ClientDetailPage = {
                     <div>
                         <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Method *</label>
                         <select name="method" class="input select" required>
-                            <option value="cash">Cash</option>
-                            <option value="gcash">GCash</option>
-                            <option value="bank_transfer">Bank Transfer</option>
-                            <option value="check">Check</option>
+                            ${UI.paymentMethodOptions('cash')}
                         </select>
                     </div>
                 </div>
@@ -634,9 +638,9 @@ const ClientDetailPage = {
                     <input name="notes" class="input" placeholder="Optional notes">
                 </div>
                 <div class="flex gap-3 justify-end pt-2">
-                    <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button>
+                    <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button>
                     <button type="submit" class="btn btn-success">
-                        <i data-lucide="check" class="w-4 h-4"></i> Record Payment
+                        <i data-lucide="check" class="w-4 h-4"></i> Registrar pagamento
                     </button>
                 </div>
             </form>
@@ -679,7 +683,7 @@ const ClientDetailPage = {
                         <p class="text-xs text-gray-400 dark:text-slate-500 mt-1">How many months to add to the loan term</p>
                     </div>
                     <div class="flex gap-3 justify-end pt-2">
-                        <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button>
+                        <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button>
                         <button type="submit" class="btn btn-primary">
                             <i data-lucide="plus-circle" class="w-4 h-4"></i> Extend Loan
                         </button>
@@ -741,7 +745,7 @@ const ClientDetailPage = {
                         <input name="notes" class="input" placeholder="Optional details">
                     </div>
                     <div class="flex gap-3 justify-end pt-2">
-                        <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button>
+                        <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button>
                         <button type="submit" class="btn btn-danger"><i data-lucide="alert-triangle" class="w-4 h-4"></i> Add Penalty</button>
                     </div>
                 </form>
@@ -775,7 +779,7 @@ const ClientDetailPage = {
         this.render(this.clientId);
     },
 
-    // ─── Test Phone Number ────────────────────────────────────────
+    // ─── Test Telefone ────────────────────────────────────────
     testPhoneNumber(phone) {
         if (!phone || phone.trim().length < 4) {
             UI.toast('No valid phone number for this client.', 'warning');
@@ -791,7 +795,7 @@ const ClientDetailPage = {
         }
 
         // Confirmation avant envoi
-        UI.showModal('Test Phone Number', `
+        UI.showModal('Test Telefone', `
             <div class="space-y-4">
                 <div class="flex items-center gap-3 p-3 rounded-xl" style="background: var(--surface-2);">
                     <div class="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
@@ -819,7 +823,7 @@ const ClientDetailPage = {
                 </div>
 
                 <div class="flex gap-3 justify-end pt-2" style="border-top: 0.5px solid var(--surface-2);">
-                    <button onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button>
+                    <button onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button>
                     <button onclick="ClientDetailPage._doSendTestSms('${phone.replace(/'/g, "\\'")}')"
                         class="btn btn-primary flex items-center gap-2">
                         <i data-lucide="send" class="w-4 h-4"></i>
@@ -910,7 +914,7 @@ const ClientDetailPage = {
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">
-                                New Total Credit (${UI.currencyCode()}) *
+                                Novo crédito total (${UI.currencyCode()}) *
                                 <span class="text-[10px] text-gray-400 font-normal block">Full amount of the new loan</span>
                             </label>
                             <input name="principal" type="number" class="input" required min="${info.remaining}" step="0.01"
@@ -931,7 +935,7 @@ const ClientDetailPage = {
                             <input name="rate" type="number" class="input" required min="0" step="0.01" inputmode="decimal" value="${defaultRate}" ${!canRenew ? 'disabled' : ''}>
                         </div>
                         <div>
-                            <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Interest Type *</label>
+                            <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Tipo de juros *</label>
                             <select name="interest_type" class="input select" ${!canRenew ? 'disabled' : ''}>
                                 <option value="fixed" ${defaultType === 'fixed' ? 'selected' : ''}>Fixed</option>
                                 <option value="declining" ${defaultType === 'declining' ? 'selected' : ''}>Declining</option>
@@ -963,7 +967,7 @@ const ClientDetailPage = {
                     </div>
 
                     <div class="flex gap-3 justify-end pt-2">
-                        <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button>
+                        <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button>
                         <button type="submit" class="btn btn-primary" ${!canRenew ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>
                             <i data-lucide="refresh-cw" class="w-4 h-4"></i> Create Renewal Loan
                         </button>
@@ -1117,7 +1121,7 @@ const ClientDetailPage = {
             <div class="mt-4 pt-3 border-t flex justify-between gap-3 items-center">
                 <button onclick="document.querySelectorAll('.print-item-check').forEach(cb => cb.checked = true)" class="btn btn-sm btn-ghost text-xs">Select All</button>
                 <div class="flex gap-2">
-                    <button onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button>
+                    <button onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button>
                     <button onclick="ClientDetailPage.submitPrint()" class="btn btn-primary" ${itemCount === 0 ? 'disabled' : ''}>
                         <i data-lucide="printer" class="w-4 h-4"></i> Print Selected
                     </button>

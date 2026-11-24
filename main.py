@@ -1,5 +1,5 @@
 """
-Lending Pro Freeware — Application Entry Point
+Prazo Certo — ponto de entrada da aplicação
 Launches the pywebview desktop window with the API backend.
 On close: auto-backup then clean shutdown.
 """

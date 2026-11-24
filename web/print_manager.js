@@ -1,5 +1,5 @@
 /**
- * Lending Pro Freeware — PrintManager
+ * Prazo Certo — PrintManager
  * Système d'impression contextuel intelligent.
  * - Bouton d'impression dans le header — adapte son action selon la page active
  * - Visualisateur PDF grand format (plein écran) intégré à l'app
@@ -28,7 +28,7 @@ const PrintManager = {
                 if (window.ClientDetailPage && ClientDetailPage.clientId) {
                     ClientDetailPage.openPrintCenter();
                 } else {
-                    UI.toast('Open a client profile to print client documents.', 'info');
+                    UI.toast('Abra a ficha do cliente para imprimir os documentos.', 'info');
                 }
                 break;
 
@@ -65,7 +65,7 @@ const PrintManager = {
 
     // ─── Loan Detail : menu choix impression ─────────────────────
     async printLoanDetail(loanId) {
-        if (!loanId) { UI.toast('No loan selected.', 'warning'); return; }
+        if (!loanId) { UI.toast('Nenhum empréstimo selecionado.', 'warning'); return; }
 
         // Petit menu contextuel
         const menuHtml = `
@@ -76,8 +76,8 @@ const PrintManager = {
                         <i data-lucide="calendar-range" class="w-4 h-4 text-blue-600 dark:text-blue-400"></i>
                     </div>
                     <div>
-                        <p class="font-semibold text-sm text-gray-800 dark:text-white">Amortization Schedule</p>
-                        <p class="text-xs text-gray-400 dark:text-slate-500">Complete installment schedule</p>
+                        <p class="font-semibold text-sm text-gray-800 dark:text-white">Carnê / amortização</p>
+                        <p class="text-xs text-gray-400 dark:text-slate-500">Tabela completa de parcelas</p>
                     </div>
                     <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300 ml-auto"></i>
                 </button>

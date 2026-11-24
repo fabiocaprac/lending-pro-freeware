@@ -1,5 +1,5 @@
 /**
- * Lending Pro Freeware — Clients Page
+ * Prazo Certo — Clients Page
  */
 const ClientsPage = {
     currentPage: 1,
@@ -12,12 +12,12 @@ const ClientsPage = {
                 <div class="flex items-center gap-3 flex-1 max-w-md">
                     <div class="relative flex-1">
                         <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                        <input type="text" id="client-search" class="input pl-10" placeholder="Search clients..." 
+                        <input type="text" id="client-search" class="input pl-10" placeholder="Buscar clientes..." 
                                value="${this.searchQuery}" oninput="ClientsPage.onSearch(this.value)">
                     </div>
                 </div>
                 <button onclick="ClientsPage.showCreateForm()" class="btn btn-primary">
-                    <i data-lucide="user-plus" class="w-4 h-4"></i> New Client
+                    <i data-lucide="user-plus" class="w-4 h-4"></i> Novo cliente
                 </button>
             </div>
             <div id="clients-table-container">
@@ -33,9 +33,9 @@ const ClientsPage = {
         const container = document.getElementById('clients-table-container');
 
         if (data.clients.length === 0) {
-            container.innerHTML = UI.emptyState('users', 'No Clients Yet',
-                'Start by adding your first borrower to the system.',
-                '<button onclick="ClientsPage.showCreateForm()" class="btn btn-primary"><i data-lucide="user-plus" class="w-4 h-4"></i> Add First Client</button>'
+            container.innerHTML = UI.emptyState('users', 'Nenhum cliente ainda',
+                'Cadastre o primeiro cliente para começar.',
+                '<button onclick="ClientsPage.showCreateForm()" class="btn btn-primary"><i data-lucide="user-plus" class="w-4 h-4"></i> Cadastrar primeiro cliente</button>'
             );
             lucide.createIcons();
             return;
@@ -110,45 +110,49 @@ const ClientsPage = {
             `<option value="${c.id}">${c.first_name} ${c.last_name} (${c.id})</option>`
         ).join('');
 
-        UI.showModal('New Client', `
+        UI.showModal('Novo cliente', `
             <form onsubmit="ClientsPage.submitCreate(event)" class="space-y-4">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">First Name *</label>
-                        <input name="first_name" class="input" required placeholder="Juan">
+                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Nome *</label>
+                        <input name="first_name" class="input" required placeholder="Maria">
                     </div>
                     <div>
-                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Last Name *</label>
-                        <input name="last_name" class="input" required placeholder="Dela Cruz">
+                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Sobrenome *</label>
+                        <input name="last_name" class="input" required placeholder="Silva">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">ID Number</label>
-                        <input name="id_number" class="input" placeholder="Passport / UMID / SSS">
+                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">CPF</label>
+                        <input name="cpf" class="input" placeholder="000.000.000-00" inputmode="numeric">
                     </div>
                     <div>
-                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Date of Birth</label>
-                        <input name="date_of_birth" type="date" class="input" max="${new Date().toISOString().split('T')[0]}">
+                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">RG / documento</label>
+                        <input name="id_number" class="input" placeholder="RG, CNH ou outro documento">
                     </div>
+                </div>
+                <div>
+                    <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Data de nascimento</label>
+                    <input name="date_of_birth" type="date" class="input" max="${new Date().toISOString().split('T')[0]}">
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Employer</label>
-                        <input name="employer" class="input" placeholder="Company name">
+                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Empregador</label>
+                        <input name="employer" class="input" placeholder="Nome da empresa">
                     </div>
                     <div>
-                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Occupation</label>
-                        <input name="occupation" class="input" placeholder="Job title">
+                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Ocupação</label>
+                        <input name="occupation" class="input" placeholder="Cargo">
                     </div>
                     <div>
-                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Gender</label>
+                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Gênero</label>
                         <select name="gender" class="input select">
-                            <option value="">— Not specified —</option>
-                            <option value="female">Female</option>
-                            <option value="male">Male</option>
-                            <option value="non_binary">Non-binary</option>
-                            <option value="prefer_not_to_say">Prefer not to say</option>
+                            <option value="">— Não informado —</option>
+                            <option value="female">Feminino</option>
+                            <option value="male">Masculino</option>
+                            <option value="non_binary">Não binário</option>
+                            <option value="prefer_not_to_say">Prefiro não dizer</option>
                         </select>
                     </div>
                 </div>
@@ -156,33 +160,33 @@ const ClientsPage = {
                     <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Address</label>
                     <div class="flex gap-2">
                         <div class="relative flex-1">
-                            <input name="address" id="create-address-input" class="input w-full" placeholder="Type to search address…"
+                            <input name="address" id="create-address-input" class="input w-full" placeholder="Digite para buscar o endereço…"
                                    oninput="if(ClientsPage._addrCoords) delete ClientsPage._addrCoords['create-address-input']; ClientsPage.searchAddress(this.value, 'create-addr-results', 'create-address-input')" autocomplete="off">
                             <div id="create-addr-results" class="absolute z-50 w-full mt-1 rounded-xl overflow-hidden shadow-xl border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 hidden max-h-48 overflow-y-auto"></div>
                         </div>
-                        <button type="button" title="View on map" class="btn btn-ghost btn-icon flex-shrink-0 text-blue-500"
+                        <button type="button" title="Ver no mapa" class="btn btn-ghost btn-icon flex-shrink-0 text-blue-500"
                                 onclick="ClientsPage.openMapFromInput('create-address-input')">
                             <i data-lucide="map-pin" class="w-4 h-4"></i>
                         </button>
                     </div>
                     <div class="mt-1.5">
-                        <input name="address_detail" class="input text-sm" placeholder="Unit / Floor / Landmark / Additional details…">
-                        <p class="text-xs text-gray-400 dark:text-slate-500 mt-0.5">Optional: apartment number, landmark, barangay details, etc.</p>
+                        <input name="address_detail" class="input text-sm" placeholder="Complemento, ponto de referência…">
+                        <p class="text-xs text-gray-400 dark:text-slate-500 mt-0.5">Opcional: apartamento, ponto de referência, bairro etc.</p>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Contact Number</label>
-                        <input name="contact" type="tel" class="input" placeholder="+41 79 123 45 67">
+                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Telefone</label>
+                        <input name="contact" type="tel" class="input" placeholder="(11) 98765-4321">
                     </div>
                     <div>
                         <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Rating</label>
                         <select name="rating" class="input select">
-                            <option value="1">⭐ 1 Star</option>
-                            <option value="2">⭐⭐ 2 Stars</option>
-                            <option value="3">⭐⭐⭐ 3 Stars</option>
-                            <option value="4">⭐⭐⭐⭐ 4 Stars</option>
-                            <option value="5" selected>⭐⭐⭐⭐⭐ 5 Stars</option>
+                            <option value="1">⭐ 1 estrela</option>
+                            <option value="2">⭐⭐ 2 estrelas</option>
+                            <option value="3">⭐⭐⭐ 3 estrelas</option>
+                            <option value="4">⭐⭐⭐⭐ 4 estrelas</option>
+                            <option value="5" selected>⭐⭐⭐⭐⭐ 5 estrelas</option>
                         </select>
                     </div>
                 </div>
@@ -192,24 +196,24 @@ const ClientsPage = {
                         <input name="email" type="email" class="input" placeholder="juan@example.com">
                     </div>
                     <div>
-                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Monthly Income (${UI.currencyCode()})</label>
+                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Renda mensal (${UI.currencyCode()})</label>
                         <input name="monthly_income" type="number" class="input" min="0" step="0.01" inputmode="decimal" placeholder="0">
                     </div>
                 </div>
                 <div>
-                    <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Referred By</label>
+                    <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Indicado por</label>
                     <select name="referred_by" class="input select">
-                        <option value="">— None —</option>
+                        <option value="">— Nenhum —</option>
                         ${referralOptions}
                     </select>
                 </div>
                 <div>
                     <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Notes</label>
-                    <textarea name="notes" class="input" rows="2" placeholder="Additional notes..."></textarea>
+                    <textarea name="notes" class="input" rows="2" placeholder="Observações..."></textarea>
                 </div>
                 <div class="flex gap-3 justify-end pt-2">
-                    <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button>
-                    <button type="submit" class="btn btn-primary"><i data-lucide="check" class="w-4 h-4"></i> Create Client</button>
+                    <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button>
+                    <button type="submit" class="btn btn-primary"><i data-lucide="check" class="w-4 h-4"></i> Cadastrar cliente</button>
                 </div>
             </form>
         `, { width: 'max-w-xl' });
@@ -229,6 +233,7 @@ const ClientsPage = {
             email: form.email.value || '',
             monthly_income: parseFloat(form.monthly_income.value) || 0,
             id_number: form.id_number?.value || '',
+            cpf: form.cpf?.value || '',
             date_of_birth: form.date_of_birth?.value || '',
             employer: form.employer?.value || '',
             occupation: form.occupation?.value || '',
@@ -239,11 +244,11 @@ const ClientsPage = {
         };
         const id = await App.api('create_client', data);
         if (!id || id.success === false) {
-            UI.toast(id?.error || 'Could not create client.', 'error');
+            UI.toast(id?.error || 'Não foi possível cadastrar o cliente.', 'error');
             return;
         }
         UI.closeModal();
-        UI.toast(`Client ${id} created successfully!`, 'success');
+        UI.toast(`Client ${id} cadastrado com sucesso!`, 'success');
         if (App.currentPage === 'clients') await this.loadClients();
         else App.navigate('clients');
     },
@@ -255,41 +260,45 @@ const ClientsPage = {
             `<option value="${c.id}" ${client.referred_by === c.id ? 'selected' : ''}>${c.first_name} ${c.last_name} (${c.id})</option>`
         ).join('');
 
-        UI.showModal('Edit Client', `
+        UI.showModal('Editar cliente', `
             <form onsubmit="ClientsPage.submitEdit(event, '${clientId}')" class="space-y-4">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">First Name *</label>
+                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Nome *</label>
                         <input name="first_name" class="input" required value="${client.first_name}">
                     </div>
                     <div>
-                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Last Name *</label>
+                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Sobrenome *</label>
                         <input name="last_name" class="input" required value="${client.last_name}">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">ID Number</label>
-                        <input name="id_number" class="input" value="${client.id_number || ''}" placeholder="Passport / UMID / SSS">
+                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">CPF</label>
+                        <input name="cpf" class="input" value="${client.cpf || ''}" placeholder="000.000.000-00" inputmode="numeric">
                     </div>
                     <div>
-                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Date of Birth</label>
-                        <input name="date_of_birth" type="date" class="input" value="${client.date_of_birth || ''}" max="${new Date().toISOString().split('T')[0]}">
+                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">RG / documento</label>
+                        <input name="id_number" class="input" value="${client.id_number || ''}" placeholder="RG, CNH ou outro documento">
                     </div>
+                </div>
+                <div>
+                    <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Data de nascimento</label>
+                    <input name="date_of_birth" type="date" class="input" value="${client.date_of_birth || ''}" max="${new Date().toISOString().split('T')[0]}">
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Employer</label>
-                        <input name="employer" class="input" value="${client.employer || ''}" placeholder="Company name">
+                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Empregador</label>
+                        <input name="employer" class="input" value="${client.employer || ''}" placeholder="Nome da empresa">
                     </div>
                     <div>
-                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Occupation</label>
-                        <input name="occupation" class="input" value="${client.occupation || ''}" placeholder="Job title">
+                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Ocupação</label>
+                        <input name="occupation" class="input" value="${client.occupation || ''}" placeholder="Cargo">
                     </div>
                     <div>
-                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Gender</label>
+                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Gênero</label>
                         <select name="gender" class="input select">
-                            ${[['','— Not specified —'],['female','Female'],['male','Male'],['non_binary','Non-binary'],['prefer_not_to_say','Prefer not to say']].map(([value,label]) => `<option value="${value}" ${client.gender === value ? 'selected' : ''}>${label}</option>`).join('')}
+                            ${[['','— Não informado —'],['female','Female'],['male','Male'],['non_binary','Não binário'],['prefer_not_to_say','Prefiro não dizer']].map(([value,label]) => `<option value="${value}" ${client.gender === value ? 'selected' : ''}>${label}</option>`).join('')}
                         </select>
                     </div>
                 </div>
@@ -297,25 +306,25 @@ const ClientsPage = {
                     <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Address</label>
                     <div class="flex gap-2">
                         <div class="relative flex-1">
-                            <input name="address" id="edit-address-input" class="input w-full" placeholder="Type to search address…"
+                            <input name="address" id="edit-address-input" class="input w-full" placeholder="Digite para buscar o endereço…"
                                    value="${client.address || ''}"
                                    oninput="if(ClientsPage._addrCoords) delete ClientsPage._addrCoords['edit-address-input']; ClientsPage.searchAddress(this.value, 'edit-addr-results', 'edit-address-input')" autocomplete="off">
                             <div id="edit-addr-results" class="absolute z-50 w-full mt-1 rounded-xl overflow-hidden shadow-xl border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 hidden max-h-48 overflow-y-auto"></div>
                         </div>
-                        <button type="button" title="View on map" class="btn btn-ghost btn-icon flex-shrink-0 text-blue-500"
+                        <button type="button" title="Ver no mapa" class="btn btn-ghost btn-icon flex-shrink-0 text-blue-500"
                                 onclick="ClientsPage.openMapFromInput('edit-address-input')">
                             <i data-lucide="map-pin" class="w-4 h-4"></i>
                         </button>
                     </div>
                     <div class="mt-1.5">
-                        <input name="address_detail" class="input text-sm" placeholder="Unit / Floor / Landmark / Additional details…" value="${client.address_detail || ''}">
-                        <p class="text-xs text-gray-400 dark:text-slate-500 mt-0.5">Optional: apartment number, landmark, barangay details, etc.</p>
+                        <input name="address_detail" class="input text-sm" placeholder="Complemento, ponto de referência…" value="${client.address_detail || ''}">
+                        <p class="text-xs text-gray-400 dark:text-slate-500 mt-0.5">Opcional: apartamento, ponto de referência, bairro etc.</p>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Contact Number</label>
-                        <input name="contact" type="tel" class="input" placeholder="+41 79 123 45 67" value="${client.contact || ''}">
+                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Telefone</label>
+                        <input name="contact" type="tel" class="input" placeholder="(11) 98765-4321" value="${client.contact || ''}">
                     </div>
                     <div>
                         <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Rating</label>
@@ -330,14 +339,14 @@ const ClientsPage = {
                         <input name="email" type="email" class="input" placeholder="juan@example.com" value="${client.email || ''}">
                     </div>
                     <div>
-                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Monthly Income (${UI.currencyCode()})</label>
+                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Renda mensal (${UI.currencyCode()})</label>
                         <input name="monthly_income" type="number" class="input" min="0" step="0.01" inputmode="decimal" value="${client.monthly_income || ''}" placeholder="0">
                     </div>
                 </div>
                 <div>
-                    <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Referred By</label>
+                    <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Indicado por</label>
                     <select name="referred_by" class="input select">
-                        <option value="">— None —</option>
+                        <option value="">— Nenhum —</option>
                         ${referralOptions}
                     </select>
                 </div>
@@ -346,7 +355,7 @@ const ClientsPage = {
                     <textarea name="notes" class="input" rows="2">${client.notes || ''}</textarea>
                 </div>
                 <div class="flex gap-3 justify-end pt-2">
-                    <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button>
+                    <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button>
                     <button type="submit" class="btn btn-primary"><i data-lucide="save" class="w-4 h-4"></i> Save Changes</button>
                 </div>
             </form>
@@ -367,6 +376,7 @@ const ClientsPage = {
             email: form.email.value || '',
             monthly_income: parseFloat(form.monthly_income.value) || 0,
             id_number: form.id_number?.value || '',
+            cpf: form.cpf?.value || '',
             date_of_birth: form.date_of_birth?.value || '',
             employer: form.employer?.value || '',
             occupation: form.occupation?.value || '',
@@ -377,7 +387,7 @@ const ClientsPage = {
         };
         const result = await App.api('update_client', clientId, data);
         if (result?.success === false) {
-            UI.toast(result.error || 'Could not update client.', 'error');
+            UI.toast(result.error || 'Não foi possível atualizar o cliente.', 'error');
             return;
         }
         UI.closeModal();

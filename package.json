@@ -1,7 +1,7 @@
 {
-  "name": "lending-pro-freeware",
+  "name": "prazo-certo",
   "version": "1.5.1",
-  "description": "Free offline desktop application for loan and repayment management",
+  "description": "App desktop offline para gestão de crediário, empréstimos e cobrança no Brasil",
   "private": false,
   "type": "commonjs",
   "scripts": {

@@ -1,5 +1,5 @@
 /**
- * Lending Pro Freeware — Loan Detail Page
+ * Prazo Certo — Loan Detail Page
  * Beautiful amortization timeline, payment history, PDF & print.
  */
 const LoanDetailPage = {
@@ -15,7 +15,7 @@ const LoanDetailPage = {
         ]);
 
         if (!loan) {
-            content.innerHTML = UI.emptyState('file-x', 'Loan Not Found', 'This loan does not exist.');
+            content.innerHTML = UI.emptyState('file-x', 'Empréstimo não encontrado', 'Este contrato não existe.');
             return;
         }
         this.loan = loan;
@@ -79,11 +79,11 @@ const LoanDetailPage = {
             </div>
 
             <div class="grid grid-cols-1 xl:grid-cols-5 gap-6">
-                <!-- Amortization Schedule — Beautiful Card Style -->
+                <!-- Carnê / amortização — Beautiful Card Style -->
                 <div class="xl:col-span-3 glass-card p-5">
                     <div class="flex items-center justify-between mb-4">
                         <h4 class="font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                            <i data-lucide="calendar-range" class="w-5 h-5 text-blue-500"></i> Amortization Schedule
+                            <i data-lucide="calendar-range" class="w-5 h-5 text-blue-500"></i> Carnê / amortização
                         </h4>
                         <span class="text-xs text-gray-400 dark:text-slate-500">${loan.schedule.length} ${(loan.repayment_frequency || 'monthly')} installments</span>
                     </div>
@@ -149,14 +149,14 @@ const LoanDetailPage = {
                             ` : ''}
                         </div>
                         ${loan.payments.length === 0 ? `
-                            <p class="text-center text-gray-400 dark:text-slate-500 py-6 text-sm">No payments recorded yet</p>
+                            <p class="text-center text-gray-400 dark:text-slate-500 py-6 text-sm">Nenhum pagamento registrado</p>
                         ` : `
                             <div class="space-y-2 max-h-72 overflow-y-auto">
                                 ${loan.payments.map(p => `
                                     <div class="flex items-center justify-between p-3 rounded-xl bg-gray-50/50 dark:bg-slate-800/50">
                                         <div class="min-w-0 flex-1">
                                             <p class="font-semibold text-sm text-green-600 dark:text-green-400">+${UI.formatCurrency(p.amount)}</p>
-                                            <p class="text-xs text-gray-400 dark:text-slate-500 truncate">${UI.formatDate(p.payment_date)} • ${(p.payment_method || 'cash').replace('_', ' ').toUpperCase()}</p>
+                                            <p class="text-xs text-gray-400 dark:text-slate-500 truncate">${UI.formatDate(p.payment_date)} • ${UI.paymentMethodLabel(p.payment_method)}</p>
                                             ${p.notes ? `<p class="text-xs text-gray-400 dark:text-slate-500 mt-0.5 truncate">${p.notes}</p>` : ''}
                                         </div>
                                         <div class="flex items-center gap-1 flex-shrink-0">
@@ -183,11 +183,11 @@ const LoanDetailPage = {
                         </h4>
                         <div class="space-y-2 text-sm">
                             <div class="flex justify-between"><span class="text-gray-500 dark:text-slate-400">Client</span><a onclick="App.navigate('client_detail', {id:'${loan.client_id}'})" class="text-blue-600 dark:text-blue-400 cursor-pointer hover:underline">${loan.first_name} ${loan.last_name}</a></div>
-                            <div class="flex justify-between"><span class="text-gray-500 dark:text-slate-400">Interest Type</span><span class="font-medium">${loan.interest_type === 'fixed' ? 'Fixed Rate' : 'Declining Balance'}</span></div>
+                            <div class="flex justify-between"><span class="text-gray-500 dark:text-slate-400">Tipo de juros</span><span class="font-medium">${loan.interest_type === 'fixed' ? 'Fixed Rate' : 'Declining Balance'}</span></div>
                             <div class="flex justify-between"><span class="text-gray-500 dark:text-slate-400">Frequency</span><span class="font-medium capitalize">${(loan.repayment_frequency || 'monthly').replace('biweekly', 'Every 2 weeks')}</span></div>
                             <div class="flex justify-between"><span class="text-gray-500 dark:text-slate-400">Installment</span><span class="font-medium">${UI.formatCurrency(loan.installment_amount || loan.monthly_payment)}</span></div>
-                            <div class="flex justify-between"><span class="text-gray-500 dark:text-slate-400">Processing Fee</span><span class="font-medium">${UI.formatCurrency(loan.processing_fee || 0)}</span></div>
-                            <div class="flex justify-between"><span class="text-gray-500 dark:text-slate-400">Insurance Fee</span><span class="font-medium">${UI.formatCurrency(loan.insurance_fee || 0)}</span></div>
+                            <div class="flex justify-between"><span class="text-gray-500 dark:text-slate-400">Taxa de cadastro</span><span class="font-medium">${UI.formatCurrency(loan.processing_fee || 0)}</span></div>
+                            <div class="flex justify-between"><span class="text-gray-500 dark:text-slate-400">Seguro</span><span class="font-medium">${UI.formatCurrency(loan.insurance_fee || 0)}</span></div>
                             <div class="flex items-center justify-between gap-3"><span class="text-gray-500 dark:text-slate-400">Collector</span><select class="input select text-xs max-w-[180px]" onchange="LoanDetailPage.assignCollector(this.value)"><option value="">Unassigned</option>${(collectors || []).map(c => `<option value="${c.id}" ${loan.collector_id === c.id ? 'selected' : ''}>${c.name}</option>`).join('')}</select></div>
                             <div class="flex justify-between"><span class="text-gray-500 dark:text-slate-400">Start Date</span><span class="font-medium">${UI.formatDate(loan.start_date)}</span></div>
                             <div class="flex justify-between"><span class="text-gray-500 dark:text-slate-400">Created</span><span class="font-medium">${UI.formatDate(loan.created_at)}</span></div>
@@ -202,7 +202,7 @@ const LoanDetailPage = {
                         ${(loan.guarantors || []).length ? `<div class="space-y-2">${loan.guarantors.map(g => `
                             <div class="p-3 rounded-xl" style="background:var(--surface-2);">
                                 <div class="flex justify-between gap-2">
-                                    <div class="min-w-0"><p class="font-semibold text-sm">${g.name}</p><p class="text-xs" style="color:var(--text-tertiary)">${g.relation || 'Relationship not specified'} · ${g.contact || 'No contact'}</p>${g.id_number ? `<p class="text-xs mt-1">ID: ${g.id_number}</p>` : ''}</div>
+                                    <div class="min-w-0"><p class="font-semibold text-sm">${g.name}</p><p class="text-xs" style="color:var(--text-tertiary)">${g.relation || 'Parentesco não informado'} · ${g.contact || 'Sem telefone'}</p>${g.id_number ? `<p class="text-xs mt-1">ID: ${g.id_number}</p>` : ''}</div>
                                     <div class="flex gap-1">
                                         <button onclick="LoanDetailPage.showGuarantorForm(${g.id})" class="btn btn-sm btn-ghost" title="Edit guarantor"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
                                         <button onclick="LoanDetailPage.showGuarantorSignature(${g.id})" class="btn btn-sm btn-ghost" title="${g.signature_path ? 'Replace signature' : 'Add signature'}"><i data-lucide="pen-line" class="w-4 h-4 ${g.signature_path ? 'text-green-500' : ''}"></i></button>
@@ -246,7 +246,7 @@ const LoanDetailPage = {
                 </div>
                 <div><label class="text-sm font-medium mb-1 block">Address</label><input name="address" class="input" value="${guarantor?.address || ''}"></div>
                 <div><label class="text-sm font-medium mb-1 block">Notes</label><textarea name="notes" class="input" rows="2">${guarantor?.notes || ''}</textarea></div>
-                <div class="flex justify-end gap-2"><button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button><button class="btn btn-primary">${guarantor ? 'Save Changes' : 'Add Guarantor'}</button></div>
+                <div class="flex justify-end gap-2"><button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button><button class="btn btn-primary">${guarantor ? 'Save Changes' : 'Add Guarantor'}</button></div>
             </form>`, { width: 'max-w-xl' });
     },
 
@@ -278,7 +278,7 @@ const LoanDetailPage = {
             <div class="space-y-3">
                 <p class="text-xs" style="color:var(--text-tertiary)">Sign inside the box using a mouse, trackpad or touch screen.</p>
                 <canvas id="guarantor-signature-canvas" width="720" height="260" class="w-full rounded-xl bg-white" style="border:1px solid var(--border); touch-action:none;"></canvas>
-                <div class="flex justify-between"><button onclick="LoanDetailPage.clearGuarantorSignature()" class="btn btn-ghost">Clear</button><div class="flex gap-2"><button onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button><button onclick="LoanDetailPage.saveGuarantorSignature(${id})" class="btn btn-primary">Save Signature</button></div></div>
+                <div class="flex justify-between"><button onclick="LoanDetailPage.clearGuarantorSignature()" class="btn btn-ghost">Clear</button><div class="flex gap-2"><button onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button><button onclick="LoanDetailPage.saveGuarantorSignature(${id})" class="btn btn-primary">Save Signature</button></div></div>
             </div>`, { width: 'max-w-2xl' });
         setTimeout(() => {
             const canvas = document.getElementById('guarantor-signature-canvas');
@@ -319,7 +319,7 @@ const LoanDetailPage = {
                     <div><label class="text-sm font-medium mb-1 block">Plate Number</label><input name="plate_number" class="input" value="${item?.plate_number || ''}"></div>
                 </div>
                 <div><label class="text-sm font-medium mb-1 block">Notes</label><textarea name="notes" class="input" rows="2">${item?.notes || ''}</textarea></div>
-                <div class="flex justify-end gap-2"><button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button><button class="btn btn-primary">${item ? 'Save Changes' : 'Add Collateral'}</button></div>
+                <div class="flex justify-end gap-2"><button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button><button class="btn btn-primary">${item ? 'Save Changes' : 'Add Collateral'}</button></div>
             </form>`, { width: 'max-w-xl' });
     },
 
@@ -360,7 +360,7 @@ const LoanDetailPage = {
         const today = new Date().toISOString().split('T')[0];
         const outstanding = Math.max(0, this.loan?.remaining || 0);
         const suggested = Math.min(this.loan?.installment_amount || this.loan?.monthly_payment || outstanding, outstanding);
-        UI.showModal('Record Payment', `
+        UI.showModal('Registrar pagamento', `
             <form onsubmit="LoanDetailPage.submitPayment(event)" class="space-y-4">
                 <div>
                     <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Amount (${UI.currencyCode()}) *</label>
@@ -376,10 +376,7 @@ const LoanDetailPage = {
                     <div>
                         <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Method *</label>
                         <select name="method" class="input select" required>
-                            <option value="cash">Cash</option>
-                            <option value="gcash">GCash</option>
-                            <option value="bank_transfer">Bank Transfer</option>
-                            <option value="check">Check</option>
+                            ${UI.paymentMethodOptions('cash')}
                         </select>
                     </div>
                 </div>
@@ -388,8 +385,8 @@ const LoanDetailPage = {
                     <input name="notes" class="input" placeholder="Optional notes">
                 </div>
                 <div class="flex gap-3 justify-end pt-2">
-                    <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button>
-                    <button type="submit" class="btn btn-success"><i data-lucide="check" class="w-4 h-4"></i> Record Payment</button>
+                    <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button>
+                    <button type="submit" class="btn btn-success"><i data-lucide="check" class="w-4 h-4"></i> Registrar pagamento</button>
                 </div>
             </form>
         `, { width: 'max-w-md' });
@@ -426,7 +423,7 @@ const LoanDetailPage = {
                     <input id="void-payment-reason" class="input" placeholder="Example: duplicate entry" autocomplete="off">
                 </div>
                 <div class="flex gap-3 justify-end pt-2">
-                    <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button>
+                    <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button>
                     <button onclick="LoanDetailPage.submitVoidPayment(${paymentId})" class="btn btn-danger">
                         <i data-lucide="undo-2" class="w-4 h-4"></i> Void Payment
                     </button>
@@ -497,7 +494,7 @@ const LoanDetailPage = {
                         <input name="months" type="number" class="input" required min="1" max="60" value="3" placeholder="3">
                     </div>
                     <div class="flex gap-3 justify-end pt-2">
-                        <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button>
+                        <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button>
                         <button type="submit" class="btn btn-primary">
                             <i data-lucide="plus-circle" class="w-4 h-4"></i> Extend Loan
                         </button>

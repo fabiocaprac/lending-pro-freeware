@@ -1,5 +1,5 @@
 """
-Lending Pro Freeware — Main API
+Prazo Certo — API principal
 Exposed to the frontend via pywebview's js_api bridge.
 All methods are callable from JavaScript as pywebview.api.<method_name>()
 """
@@ -25,7 +25,13 @@ from dateutil.relativedelta import relativedelta
 
 import logger as app_logger  # persistent error logger
 from app_config import APP_NAME, DEMO_ONLY
-from currency_utils import normalize_currency
+from currency_utils import (
+    DEFAULT_LANGUAGE,
+    VALID_PAYMENT_METHODS,
+    PAYMENT_METHOD_ALIASES,
+    normalize_currency,
+    format_cpf,
+)
 
 from database import (
     get_connection, dict_from_row, rows_to_list,
@@ -51,12 +57,6 @@ from backup import (
 PDF_DIR = os.path.join(APP_SUPPORT_DIR, "pdfs")
 os.makedirs(PDF_DIR, exist_ok=True)
 
-VALID_PAYMENT_METHODS = {"cash", "gcash", "bank_transfer", "check"}
-PAYMENT_METHOD_ALIASES = {
-    "bank": "bank_transfer",
-    "bank transfer": "bank_transfer",
-    "bank-transfer": "bank_transfer",
-}
 PASSWORD_HASH_ALGO = "pbkdf2_sha256"
 PASSWORD_HASH_ITERATIONS = 260_000
 
@@ -66,7 +66,7 @@ def _normalize_payment_method(method):
     normalized = PAYMENT_METHOD_ALIASES.get(normalized, normalized)
     if normalized not in VALID_PAYMENT_METHODS:
         raise ValueError(
-            "Invalid payment method. Use cash, gcash, bank_transfer, or check."
+            "Forma de pagamento inválida. Use dinheiro, PIX, transferência, boleto, cartão ou cheque."
         )
     return normalized
 
@@ -766,19 +766,19 @@ class Api:
             c.execute(f"""
                 SELECT * FROM clients
                 WHERE first_name LIKE ? OR last_name LIKE ? OR id LIKE ? OR contact LIKE ?
-                   OR id_number LIKE ? OR employer LIKE ?
+                   OR id_number LIKE ? OR employer LIKE ? OR cpf LIKE ?
                 ORDER BY {sort} {order}
                 LIMIT ? OFFSET ?
             """, (search_param, search_param, search_param, search_param,
-                  search_param, search_param, per_page, offset))
+                  search_param, search_param, search_param, per_page, offset))
             rows = rows_to_list(c.fetchall())
 
             c.execute("""
                 SELECT COUNT(*) FROM clients
                 WHERE first_name LIKE ? OR last_name LIKE ? OR id LIKE ? OR contact LIKE ?
-                   OR id_number LIKE ? OR employer LIKE ?
+                   OR id_number LIKE ? OR employer LIKE ? OR cpf LIKE ?
             """, (search_param, search_param, search_param, search_param,
-                  search_param, search_param))
+                  search_param, search_param, search_param))
         else:
             c.execute(f"SELECT * FROM clients ORDER BY {sort} {order} LIMIT ? OFFSET ?",
                       (per_page, offset))
@@ -874,7 +874,7 @@ class Api:
             first_name = str(data.get("first_name") or "").strip()
             last_name = str(data.get("last_name") or "").strip()
             if not first_name or not last_name:
-                raise ValueError("First name and last name are required.")
+                raise ValueError("Nome e sobrenome são obrigatórios.")
 
             rating = int(data.get("rating", 3))
             if rating < 1 or rating > 5:
@@ -902,8 +902,8 @@ class Api:
                 INSERT INTO clients
                     (id, first_name, last_name, address, address_detail, contact, email,
                      rating, referred_by, notes, monthly_income, id_number, date_of_birth,
-                     employer, occupation, gender, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                     employer, occupation, gender, cpf, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 client_id,
                 first_name,
@@ -921,6 +921,7 @@ class Api:
                 str(data.get("employer") or "").strip(),
                 str(data.get("occupation") or "").strip(),
                 gender,
+                format_cpf(data.get("cpf") or ""),
                 now,
                 now,
             ))
@@ -980,12 +981,14 @@ class Api:
                 'first_name', 'last_name', 'address', 'address_detail', 'contact', 'email',
                 'rating', 'referred_by', 'notes', 'photo_path', 'id_photo_path',
                 'monthly_income', 'social_media', 'id_number', 'date_of_birth',
-                'employer', 'occupation', 'gender',
+                'employer', 'occupation', 'gender', 'cpf',
             ]
             for key in allowed:
                 if key in data:
                     fields.append(f"{key} = ?")
                     value = data[key]
+                    if key == "cpf":
+                        value = format_cpf(value)
                     values.append(value if value != '' else (None if key == 'referred_by' else ''))
             fields.append("updated_at = ?")
             values.extend([datetime.now().isoformat(), client_id])
@@ -2727,7 +2730,7 @@ class Api:
             export_dir = os.path.join(APP_SUPPORT_DIR, "exports")
             os.makedirs(export_dir, exist_ok=True)
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            output_path = os.path.join(export_dir, f"PH-Lending_Export_{timestamp}.xlsx")
+            output_path = os.path.join(export_dir, f"PrazoCerto_Export_{timestamp}.xlsx")
             path = export_all_to_excel(output_path)
             _open_native(path)
             return {"success": True, "path": path}
@@ -2745,7 +2748,7 @@ class Api:
             os.makedirs(export_dir, exist_ok=True)
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             label = '_'.join(sorted(sheets)) if isinstance(sheets, list) and len(sheets) < 6 else 'all'
-            output_path = os.path.join(export_dir, f"PH-Lending_{label}_{timestamp}.xlsx")
+            output_path = os.path.join(export_dir, f"PrazoCerto_{label}_{timestamp}.xlsx")
             path = export_selective(
                 output_path,
                 sheets if isinstance(sheets, list) else list(sheets),
@@ -2976,6 +2979,9 @@ class Api:
             normalized = dict(data or {})
             if "currency" in normalized:
                 normalized["currency"] = normalize_currency(normalized["currency"])
+            if "language" in normalized:
+                lang = str(normalized["language"] or DEFAULT_LANGUAGE).replace("_", "-")
+                normalized["language"] = "pt-BR" if lang.lower().startswith("pt") else DEFAULT_LANGUAGE
             if "auto_penalty_type" in normalized and normalized["auto_penalty_type"] not in {"fixed", "percentage"}:
                 raise ValueError("Invalid automatic penalty type.")
             for key in ("auto_penalty_rate", "auto_penalty_max_pct"):
@@ -3626,18 +3632,18 @@ end tell
         default_templates = [
             {
                 "id": "reminder",
-                "name": "Payment Reminder",
-                "text": "Hi {name}, your payment of {amount} was due on {date}. Please settle your balance as soon as possible. — {company}"
+                "name": "Lembrete de parcela",
+                "text": "Olá {name}, sua parcela de {amount} venceu em {date}. Por favor, quite o valor o quanto antes. — {company}"
             },
             {
                 "id": "overdue",
-                "name": "Urgent Overdue",
-                "text": "URGENT: {name}, your payment of {amount} is {days} days overdue. Please contact us immediately at {phone}. — {company}"
+                "name": "Atraso urgente",
+                "text": "URGENTE: {name}, sua parcela de {amount} está atrasada há {days} dias. Entre em contato agora pelo {phone}. — {company}"
             },
             {
                 "id": "final",
-                "name": "Final Warning",
-                "text": "FINAL WARNING — {name}: A balance of {amount} has been overdue for {days} days. Failure to pay within 48 hours may result in legal action. — {company}"
+                "name": "Último aviso",
+                "text": "ÚLTIMO AVISO — {name}: há um saldo de {amount} em atraso há {days} dias. Regularize em até 48 horas para evitar medidas de cobrança. — {company}"
             }
         ]
 

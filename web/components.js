@@ -1,5 +1,5 @@
 /**
- * Lending Pro Freeware — Reusable UI Components
+ * Prazo Certo — componentes de interface
  * Modal, Toast, StarRating, DataTable, StatCard, MapOverlay
  */
 
@@ -274,11 +274,11 @@ const UI = {
     // ═══════════════════════════════════════════════════════════
     badge(status) {
         const map = {
-            active: { class: 'badge-active', icon: 'activity', label: 'Active' },
-            paid: { class: 'badge-paid', icon: 'check-circle', label: 'Paid' },
-            defaulted: { class: 'badge-defaulted', icon: 'alert-circle', label: 'Defaulted' },
-            refinanced: { class: 'badge-pending', icon: 'refresh-cw', label: 'Refinanced' },
-            pending: { class: 'badge-pending', icon: 'clock', label: 'Pending' },
+            active: { class: 'badge-active', icon: 'activity', label: 'Ativo' },
+            paid: { class: 'badge-paid', icon: 'check-circle', label: 'Quitado' },
+            defaulted: { class: 'badge-defaulted', icon: 'alert-circle', label: 'Inadimplente' },
+            refinanced: { class: 'badge-pending', icon: 'refresh-cw', label: 'Renegociado' },
+            pending: { class: 'badge-pending', icon: 'clock', label: 'Pendente' },
         };
         const s = map[status] || { class: 'badge-active', icon: 'circle', label: status };
         return `<span class="badge ${s.class}"><i data-lucide="${s.icon}" class="w-3 h-3"></i>${s.label}</span>`;
@@ -366,11 +366,11 @@ const UI = {
     // ═══════════════════════════════════════════════════════════
     confirm(message, onConfirm) {
         UI._currentConfirmCall = onConfirm;
-        UI.showModal('Confirm', `
+        UI.showModal('Confirmar', `
             <p class="text-gray-600 dark:text-slate-300 mb-6">${message}</p>
             <div class="flex gap-3 justify-end">
-                <button onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button>
-                <button onclick="if(UI._currentConfirmCall) UI._currentConfirmCall(); UI.closeModal();" class="btn btn-danger">Confirm</button>
+                <button onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button>
+                <button onclick="if(UI._currentConfirmCall) UI._currentConfirmCall(); UI.closeModal();" class="btn btn-danger">Confirmar</button>
             </div>
         `, { width: 'max-w-sm' });
     },
@@ -380,38 +380,87 @@ const UI = {
     // ═══════════════════════════════════════════════════════════
     formatCurrency(amount) {
         const value = amount == null || isNaN(amount) ? 0 : Number(amount);
-        const currency = App.currencyCode || 'PHP';
+        const currency = App.currencyCode || 'BRL';
         try {
-            return new Intl.NumberFormat(undefined, {
+            return new Intl.NumberFormat('pt-BR', {
                 style: 'currency',
                 currency,
-                currencyDisplay: 'narrowSymbol'
+                currencyDisplay: 'symbol'
             }).format(value);
         } catch (error) {
-            return `${currency} ${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            return `${currency} ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         }
     },
 
     currencyCode() {
-        return App.currencyCode || 'PHP';
+        return App.currencyCode || 'BRL';
+    },
+
+    _dateParts(dateStr) {
+        if (!dateStr) return null;
+        const text = String(dateStr);
+        const match = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (match) return { y: match[1], m: match[2], d: match[3] };
+        const d = new Date(dateStr);
+        if (Number.isNaN(d.getTime())) return null;
+        return {
+            y: String(d.getFullYear()),
+            m: String(d.getMonth() + 1).padStart(2, '0'),
+            d: String(d.getDate()).padStart(2, '0')
+        };
     },
 
     formatDate(dateStr) {
-        if (!dateStr) return '—';
-        const d = new Date(dateStr);
-        return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        const parts = this._dateParts(dateStr);
+        return parts ? `${parts.d}/${parts.m}/${parts.y}` : '—';
     },
 
     formatDateShort(dateStr) {
-        if (!dateStr) return '—';
-        const d = new Date(dateStr);
-        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const parts = this._dateParts(dateStr);
+        return parts ? `${parts.d}/${parts.m}` : '—';
     },
 
     formatDateTime(dateStr) {
         if (!dateStr) return '—';
+        const date = this.formatDate(dateStr);
         const d = new Date(dateStr);
-        return d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' +
-            d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        if (Number.isNaN(d.getTime())) return date;
+        return date + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    },
+
+    formatPhone(value) {
+        const digits = String(value || '').replace(/\D/g, '');
+        if (digits.length === 11) return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+        if (digits.length === 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+        return value || '—';
+    },
+
+    formatCpf(value) {
+        const digits = String(value || '').replace(/\D/g, '').slice(0, 11);
+        if (digits.length === 11) return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
+        return value || '';
+    },
+
+    paymentMethods: [
+        { value: 'cash', label: 'Dinheiro' },
+        { value: 'pix', label: 'PIX' },
+        { value: 'bank_transfer', label: 'Transferência' },
+        { value: 'boleto', label: 'Boleto' },
+        { value: 'card', label: 'Cartão' },
+        { value: 'check', label: 'Cheque' }
+    ],
+
+    paymentMethodLabel(method) {
+        const key = String(method || 'cash').toLowerCase();
+        if (key === 'gcash') return 'PIX';
+        const found = this.paymentMethods.find(item => item.value === key);
+        return found ? found.label : (method || 'Dinheiro');
+    },
+
+    paymentMethodOptions(selected) {
+        const current = selected === 'gcash' ? 'pix' : selected;
+        return this.paymentMethods.map(item =>
+            `<option value="${item.value}" ${current === item.value ? 'selected' : ''}>${item.label}</option>`
+        ).join('');
     }
 };

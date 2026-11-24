@@ -1,5 +1,5 @@
 /**
- * Lending Pro Freeware — Main Application
+ * Prazo Certo — Main Application
  * SPA Router, Apple Design, Sound Engine, pywebview API Bridge
  */
 
@@ -172,80 +172,6 @@ const SoundEngine = {
 
 };
 
-// Donation reminder frequency is stored locally because this offline app does
-// not receive Ko-fi payment status.
-const DonationSupport = {
-    url: 'https://ko-fi.com/astonswissapp',
-    weekMs: 7 * 24 * 60 * 60 * 1000,
-    quarterMs: 90 * 24 * 60 * 60 * 1000,
-    lastPromptKey: 'lpf-donation-last-prompt-at',
-    donatedKey: 'lpf-donation-confirmed-at',
-
-    async init() {},
-
-    maybePrompt() {
-        const lastPrompt = Number(localStorage.getItem(this.lastPromptKey) || 0);
-        const interval = this.hasDonated() ? this.quarterMs : this.weekMs;
-        if (!Number.isFinite(lastPrompt) || Date.now() - lastPrompt >= interval) {
-            this.show(true);
-        }
-    },
-
-    hasDonated() {
-        return Boolean(localStorage.getItem(this.donatedKey));
-    },
-
-    show(recordScheduledPrompt = false) {
-        if (recordScheduledPrompt) {
-            localStorage.setItem(this.lastPromptKey, String(Date.now()));
-        }
-        const reminder = this.hasDonated() ? I18n.t('quarterly') : I18n.t('weekly');
-        UI.showModal(I18n.t('title'), `
-            <div class="text-center space-y-4 py-2">
-                <div class="w-14 h-14 rounded-2xl mx-auto flex items-center justify-center"
-                     style="background:rgba(255,149,0,0.12); color:#B86700;">
-                    <i data-lucide="coffee" class="w-7 h-7"></i>
-                </div>
-                <div class="space-y-2">
-                    <p class="text-sm font-semibold" style="color:var(--text-primary)">
-                        ${I18n.t('message')}
-                    </p>
-                    <p class="text-sm" style="color:var(--text-secondary)">
-                        ${I18n.t('minimum')}
-                    </p>
-                </div>
-                <div class="flex flex-wrap gap-2 justify-center pt-1">
-                    <button onclick="UI.closeModal()" class="btn btn-ghost">${I18n.t('later')}</button>
-                    <button onclick="DonationSupport.confirmDonation()" class="btn btn-ghost">${I18n.t('donated')}</button>
-                    <button onclick="DonationSupport.open()" class="btn btn-primary">
-                        <i data-lucide="coffee" class="w-4 h-4"></i> ${I18n.t('coffee')}
-                    </button>
-                </div>
-                <p class="text-[11px]" style="color:var(--text-tertiary)">
-                    ${reminder}
-                </p>
-            </div>
-        `, { width: 'max-w-md' });
-    },
-
-    async open() {
-        const result = await App.api('open_url', this.url);
-        if (!result?.success) {
-            UI.toast(result?.error || 'Could not open the donation page.', 'error');
-            return;
-        }
-        UI.closeModal();
-    },
-
-    confirmDonation() {
-        const now = String(Date.now());
-        localStorage.setItem(this.donatedKey, now);
-        localStorage.setItem(this.lastPromptKey, now);
-        UI.closeModal();
-        UI.toast(I18n.t('thanks'), 'success');
-    }
-};
-
 // ─── App ──────────────────────────────────────────────────────
 const App = {
     currentPage: 'dashboard',
@@ -255,9 +181,9 @@ const App = {
     sidebarOpen: false,
     calcExpression: '',
     calcLastResult: false,
-    appName: 'Lending Pro Freeware',
-    currencyCode: 'PHP',
-    language: 'en',
+    appName: 'Prazo Certo',
+    currencyCode: 'BRL',
+    language: 'pt-BR',
     isDemoOnly: false,
     isDemoEdition: false,
     isDemoMode: false,
@@ -298,7 +224,7 @@ const App = {
         try {
             authState = await pywebview.api.get_startup_auth_state();
         } catch (error) {
-            authState = { success: false, error: error?.message || 'Security state unavailable.' };
+            authState = { success: false, error: error?.message || 'Estado de segurança indisponível.' };
         }
 
         if (!authState?.success) {
@@ -331,7 +257,7 @@ const App = {
 
         this.startupLoginEnabled = Boolean(state.login_enabled ?? state.required ?? true);
         if (company) company.textContent = state.company_name || this.appName;
-        if (profile) profile.textContent = `${state.profile_name || 'Main Profile'} · Local data protected`;
+        if (profile) profile.textContent = `${state.profile_name || 'Perfil principal'} · Dados locais protegidos`;
         if (loading) loading.classList.add('hidden');
         if (loadError) loadError.classList.add('hidden');
         if (form) form.classList.remove('hidden');
@@ -384,7 +310,7 @@ const App = {
             const remaining = Number.isInteger(result?.attempts_remaining) && result.attempts_remaining > 0
                 ? ` ${result.attempts_remaining} attempt${result.attempts_remaining === 1 ? '' : 's'} remaining.`
                 : '';
-            error.textContent = (result?.error || 'Could not unlock this profile.') + remaining;
+            error.textContent = (result?.error || 'Não foi possível desbloquear este perfil.') + remaining;
             error.classList.remove('hidden');
         }
         const panel = document.querySelector('.auth-panel');
@@ -408,7 +334,7 @@ const App = {
                 button.disabled = blocked;
                 button.querySelector('span').textContent = blocked
                     ? `Try again in ${remaining}s`
-                    : 'Unlock workspace';
+                    : 'Desbloquear';
             }
             if (input) input.disabled = blocked;
             if (!blocked) {
@@ -420,7 +346,7 @@ const App = {
         render();
         if (remaining >= 0 && seconds > 0) this._authCountdownTimer = setInterval(render, 1000);
         if (seconds > 0 && error) {
-            error.textContent = `Too many attempts. Please wait ${Math.ceil(seconds)} seconds.`;
+            error.textContent = `Muitas tentativas. Aguarde ${Math.ceil(seconds)} seconds.`;
             error.classList.remove('hidden');
         }
     },
@@ -439,7 +365,7 @@ const App = {
     async lockSession() {
         const result = await pywebview.api.lock_session();
         if (!result?.success) {
-            UI.toast(result?.error || 'Could not lock this session.', 'warning');
+            UI.toast(result?.error || 'Não foi possível bloquear esta sessão.', 'warning');
             return;
         }
         const state = await pywebview.api.get_startup_auth_state();
@@ -468,8 +394,8 @@ const App = {
         // Load company name
         try {
             const settings = await pywebview.api.get_settings();
-            this.currencyCode = settings.currency || 'PHP';
-            this.language = settings.language || navigator.language || 'en';
+            this.currencyCode = settings.currency || 'BRL';
+            this.language = 'pt-BR';
             I18n.setLanguage(this.language);
             if (settings.company_name) {
                 const el = document.getElementById('sidebar-company-name');
@@ -479,9 +405,6 @@ const App = {
 
         await this.navigate('dashboard');
         lucide.createIcons();
-        await DonationSupport.init();
-        DonationSupport.maybePrompt();
-
         // Load and refresh overdue alerts badge
         this.refreshAlertsBadge();
         setInterval(() => this.refreshAlertsBadge(), 5 * 60 * 1000); // every 5 min
@@ -520,7 +443,7 @@ const App = {
             if (logo) {
                 container.innerHTML = `<img src="${logo}" class="w-full h-full object-cover rounded-xl">`;
             } else {
-                container.innerHTML = `<img src="assets/lending-pro-mark.png" class="w-full h-full object-cover" alt="Lending Pro">`;
+                container.innerHTML = `<img src="assets/lending-pro-mark.png" class="w-full h-full object-cover" alt="Prazo Certo">`;
             }
         } catch (e) { }
     },
@@ -540,11 +463,11 @@ const App = {
 
         button.classList.remove('hidden');
         button.classList.add('flex');
-        button.title = this.isDemoMode ? 'Leave demo mode' : 'Try demo mode';
+        button.title = this.isDemoMode ? 'Sair da demo' : 'Testar modo demo';
         button.style.cssText = this.isDemoMode
             ? 'background:#B86700; color:white; border:1px solid #B86700;'
             : 'background:rgba(255,149,0,0.12); color:#B86700; border:1px solid rgba(255,149,0,0.28);';
-        if (label) label.textContent = this.isDemoMode ? 'Leave demo' : 'Try demo';
+        if (label) label.textContent = this.isDemoMode ? 'Sair da demo' : 'Testar demo';
         if (icon) {
             icon.setAttribute('data-lucide', this.isDemoMode ? 'log-out' : 'flask-conical');
             lucide.createIcons({ nodes: [icon] });
@@ -561,10 +484,10 @@ const App = {
         if (button) button.disabled = true;
 
         try {
-            if (enabled) UI.toast('Preparing demonstration data…', 'info');
+            if (enabled) UI.toast('Preparando dados de demonstração…', 'info');
             const result = await this.api('toggle_demo_mode', enabled);
             if (!result?.success) {
-                UI.toast(result?.error || 'Could not change demo mode.', 'error');
+                UI.toast(result?.error || 'Não foi possível alterar o modo demo.', 'error');
                 return;
             }
 
@@ -574,13 +497,13 @@ const App = {
             this.updateDemoControl();
 
             const settings = await this.api('get_settings');
-            this.currencyCode = settings.currency || 'PHP';
+            this.currencyCode = settings.currency || 'BRL';
             const nameEl = document.getElementById('sidebar-company-name');
             if (nameEl) nameEl.textContent = settings.company_name || this.appName;
             await this.refreshAlertsBadge();
             await this.navigate('dashboard');
             UI.toast(
-                enabled ? 'Demo mode enabled: fictitious data only.' : 'Demo mode closed: personal database active.',
+                enabled ? 'Modo demo ativo: somente dados fictícios.' : 'Demo encerrada: banco pessoal ativo.',
                 'success'
             );
         } finally {
@@ -606,22 +529,22 @@ const App = {
         content.innerHTML = UI.skeleton(5);
 
         const titles = {
-            dashboard: ['Dashboard', 'Overview of your lending portfolio'],
-            clients: ['Clients', 'Manage your borrower database'],
-            client_detail: ['Client Details', 'View client profile and history'],
-            loans: ['Loans', 'Manage all loan agreements'],
-            loan_detail: ['Loan Details', 'View loan schedule and payments'],
-            payments: ['Payments', 'Track all payment transactions'],
-            calendar: ['Collection Calendar', "Today's and upcoming collections"],
-            alerts: ['Overdue Alerts', 'Late paying clients & SMS notifications'],
-            commissions: ['Referral Commissions', 'Track referral earnings'],
-            settings: ['Settings', 'Application configuration and backup'],
-            help: ['Help & User Guide', 'Complete guide to using Lending Pro Freeware'],
-            about: ['About', 'Application information and public project support'],
-            logs: ['System Logs', 'Persistent logs — errors & events'],
+            dashboard: ['Painel', 'Visão geral da carteira de crediário'],
+            clients: ['Clientes', 'Cadastro de clientes do crediário'],
+            client_detail: ['Ficha do cliente', 'Perfil, contratos e histórico'],
+            loans: ['Empréstimos', 'Contratos e carnês'],
+            loan_detail: ['Detalhe do empréstimo', 'Parcelas e pagamentos do contrato'],
+            payments: ['Pagamentos', 'Todos os recebimentos'],
+            calendar: ['Agenda de cobrança', 'Vencimentos de hoje e próximos'],
+            alerts: ['Alertas de atraso', 'Clientes em atraso e avisos por SMS'],
+            commissions: ['Comissões de indicação', 'Acompanhe as indicações'],
+            settings: ['Configurações', 'Empresa, juros, backup e SMS'],
+            help: ['Ajuda e manual', 'Como usar o Prazo Certo'],
+            about: ['Sobre', 'Sobre o produto'],
+            logs: ['Registros', 'Erros e eventos gravados no aparelho'],
         };
 
-        const [title, subtitle] = titles[page] || ['Lending Pro Freeware', ''];
+        const [title, subtitle] = titles[page] || ['Prazo Certo', ''];
         document.getElementById('page-title').textContent = title;
         document.getElementById('page-subtitle').textContent = subtitle;
 
@@ -649,9 +572,9 @@ const App = {
             content.innerHTML = `
                 <div class="flex flex-col items-center justify-center py-20">
                     <i data-lucide="alert-triangle" class="w-12 h-12 mb-4" style="color: var(--apple-red)"></i>
-                    <p class="text-lg font-semibold" style="color: var(--text-primary)">Error loading page</p>
+                    <p class="text-lg font-semibold" style="color: var(--text-primary)">Erro ao abrir a página</p>
                     <p class="text-sm mt-1" style="color: var(--text-secondary)">${err.message}</p>
-                    <button onclick="App.navigate('dashboard')" class="btn btn-primary mt-5">Go to Dashboard</button>
+                    <button onclick="App.navigate('dashboard')" class="btn btn-primary mt-5">Ir ao painel</button>
                 </div>
             `;
         }
@@ -705,10 +628,10 @@ const App = {
         if (!icon || !label) return;
         if (this.darkMode) {
             icon.setAttribute('data-lucide', 'sun');
-            label.textContent = 'Light Mode';
+            label.textContent = 'Modo claro';
         } else {
             icon.setAttribute('data-lucide', 'moon');
-            label.textContent = 'Dark Mode';
+            label.textContent = 'Modo escuro';
         }
         lucide.createIcons();
     },
@@ -717,7 +640,7 @@ const App = {
     quickToggleSound() {
         SoundEngine.setEnabled(!SoundEngine.enabled);
         if (SoundEngine.enabled) SoundEngine.success();
-        UI.toast(SoundEngine.enabled ? 'Sounds on.' : 'Sounds off.', 'info');
+        UI.toast(SoundEngine.enabled ? 'Sons ligados.' : 'Sons desligados.', 'info');
         // Update settings toggle if visible
         const toggle = document.getElementById('sounds-toggle');
         if (toggle) toggle.checked = SoundEngine.enabled;
@@ -741,29 +664,29 @@ const App = {
         } catch (e) { }
     },
 
-    // ─── Quick Actions ───────────────────────────────────────
+    // ─── Ações rápidas ───────────────────────────────────────
     showQuickActions() {
-        UI.showModal('Quick Actions', `
+        UI.showModal('Ações rápidas', `
             <div class="grid grid-cols-2 gap-3">
                 <button onclick="UI.closeModal(); ClientsPage.showCreateForm();" class="glass-card p-4 text-left cursor-pointer">
                     <i data-lucide="user-plus" class="w-6 h-6 mb-2" style="color:var(--accent)"></i>
-                    <p class="font-semibold text-sm" style="color:var(--text-primary)">New Client</p>
-                    <p class="text-xs mt-0.5" style="color:var(--text-secondary)">Add a borrower</p>
+                    <p class="font-semibold text-sm" style="color:var(--text-primary)">Novo cliente</p>
+                    <p class="text-xs mt-0.5" style="color:var(--text-secondary)">Cadastrar cliente</p>
                 </button>
                 <button onclick="UI.closeModal(); LoansPage.showCreateForm();" class="glass-card p-4 text-left cursor-pointer">
                     <i data-lucide="banknote" class="w-6 h-6 mb-2" style="color:var(--apple-green)"></i>
-                    <p class="font-semibold text-sm" style="color:var(--text-primary)">New Loan</p>
-                    <p class="text-xs mt-0.5" style="color:var(--text-secondary)">Create a loan</p>
+                    <p class="font-semibold text-sm" style="color:var(--text-primary)">Novo empréstimo</p>
+                    <p class="text-xs mt-0.5" style="color:var(--text-secondary)">Registrar um contrato</p>
                 </button>
                 <button onclick="UI.closeModal(); LoansPage.statusFilter='active'; App.navigate('loans');" class="glass-card p-4 text-left cursor-pointer">
                     <i data-lucide="receipt" class="w-6 h-6 mb-2" style="color:var(--apple-purple)"></i>
-                    <p class="font-semibold text-sm" style="color:var(--text-primary)">Record Payment</p>
-                    <p class="text-xs mt-0.5" style="color:var(--text-secondary)">Select active loan →</p>
+                    <p class="font-semibold text-sm" style="color:var(--text-primary)">Registrar pagamento</p>
+                    <p class="text-xs mt-0.5" style="color:var(--text-secondary)">Escolha um contrato ativo →</p>
                 </button>
                 <button onclick="UI.closeModal(); App.navigate('calendar');" class="glass-card p-4 text-left cursor-pointer">
                     <i data-lucide="calendar-check" class="w-6 h-6 mb-2" style="color:var(--apple-orange)"></i>
                     <p class="font-semibold text-sm" style="color:var(--text-primary)">Collections</p>
-                    <p class="text-xs mt-0.5" style="color:var(--text-secondary)">View due today</p>
+                    <p class="text-xs mt-0.5" style="color:var(--text-secondary)">Ver vencimentos de hoje</p>
                 </button>
             </div>
         `, { width: 'max-w-md' });
@@ -771,17 +694,17 @@ const App = {
 
     // ─── Quit ────────────────────────────────────────────────
     quitApp() {
-        UI.showModal(`Quit ${this.appName}?`, `
+        UI.showModal(`Sair do ${this.appName}?`, `
             <div class="text-center space-y-4 py-2">
                 <div class="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center"
                      style="background:rgba(255,59,48,0.10)">
                     <i data-lucide="power" class="w-8 h-8" style="color:var(--apple-red)"></i>
                 </div>
-                <p class="text-sm" style="color:var(--text-secondary)">A backup will be created automatically before closing.</p>
+                <p class="text-sm" style="color:var(--text-secondary)">Um backup será criado automaticamente antes de sair.</p>
                 <div class="flex gap-3 justify-center pt-1">
-                    <button onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button>
+                    <button onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button>
                     <button onclick="App._doQuit()" class="btn btn-danger">
-                        <i data-lucide="power" class="w-4 h-4"></i> Quit & Save
+                        <i data-lucide="power" class="w-4 h-4"></i> Sair e salvar
                     </button>
                 </div>
             </div>
@@ -791,7 +714,7 @@ const App = {
 
     async _doQuit() {
         UI.closeModal();
-        UI.toast('Saving backup...', 'info');
+        UI.toast('Salvando backup...', 'info');
         try { await pywebview.api.quit_app(true); } catch (e) { }
     },
 
@@ -808,17 +731,17 @@ const App = {
             el.style.cssText = 'display:flex; background:rgba(0,122,255,0.10); color:var(--accent);';
             dot.style.background = 'var(--accent)';
             dot.classList.add('animate-pulse');
-            text.textContent = 'Saving…';
+            text.textContent = 'Salvando…';
         } else if (state === 'saved') {
             el.style.cssText = 'display:flex; background:rgba(52,199,89,0.10); color:#1A8F3A;';
             dot.style.background = 'var(--apple-green)';
             dot.classList.remove('animate-pulse');
-            text.textContent = 'Saved ✓';
+            text.textContent = 'Salvo ✓';
             this._autoSaveTimer = setTimeout(() => { el.classList.add('hidden'); el.classList.remove('flex'); }, 2000);
         } else if (state === 'error') {
             el.style.cssText = 'display:flex; background:rgba(255,59,48,0.10); color:var(--apple-red);';
             dot.style.background = 'var(--apple-red)';
-            text.textContent = 'Save failed!';
+            text.textContent = 'Falha ao salvar';
             this._autoSaveTimer = setTimeout(() => { el.classList.add('hidden'); el.classList.remove('flex'); }, 4000);
         }
     },
@@ -915,7 +838,7 @@ const App = {
             return await pywebview.api[method](...args);
         } catch (err) {
             console.error(`API error (${method}):`, err);
-            UI.toast(`API Error: ${err.message || 'Unknown error'}`, 'error');
+            UI.toast(`Erro da API: ${err.message || 'Erro desconhecido'}`, 'error');
             throw err;
         }
     },
@@ -925,16 +848,16 @@ const App = {
         const btn = document.getElementById('print-btn');
         if (!btn) return;
         const tips = {
-            loan_detail: 'Print — Amortization or Contract',
-            client_detail: 'Print — Client Documents',
-            dashboard: 'Print Dashboard',
-            clients: 'Print Client List',
-            loans: 'Print Loans List',
-            payments: 'Print Payments',
-            calendar: 'Print Calendar',
-            alerts: 'Print Alerts',
+            loan_detail: 'Imprimir — carnê ou contrato',
+            client_detail: 'Imprimir — documentos do cliente',
+            dashboard: 'Imprimir painel',
+            clients: 'Imprimir lista de clientes',
+            loans: 'Imprimir empréstimos',
+            payments: 'Imprimir pagamentos',
+            calendar: 'Imprimir agenda',
+            alerts: 'Imprimir alertas',
         };
-        btn.title = tips[page] || 'Print this page';
+        btn.title = tips[page] || 'Imprimir esta página';
     }
 };
 

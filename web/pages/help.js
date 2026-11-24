@@ -1,5 +1,5 @@
 /**
- * Lending Pro Freeware — Help & User Guide Page
+ * Prazo Certo — Ajuda e manual Page
  * Interactive accordion FAQ / user manual
  */
 const HelpPage = {
@@ -23,15 +23,15 @@ const HelpPage = {
                             <i data-lucide="bar-chart-2" class="w-4 h-4 text-blue-500"></i> The 4 Main Statistics
                         </h5>
                         <ul class="space-y-2 text-sm text-gray-600 dark:text-slate-400">
-                            <li>• <strong>Active Capital</strong> — Total sum of all active loan principals (status = active)</li>
+                            <li>• <strong>Capital ativo</strong> — Total sum of all active loan principals (status = active)</li>
                             <li>• <strong>Collected Interest</strong> — Interest portion actually covered by recorded payments</li>
-                            <li>• <strong>Default Rate</strong> — Percentage of loans marked "defaulted" out of total active</li>
-                            <li>• <strong>Total Clients</strong> — Number of clients in the database</li>
+                            <li>• <strong>Inadimplência</strong> — Percentage of loans marked "defaulted" out of total active</li>
+                            <li>• <strong>Total de clientes</strong> — Number of clients in the database</li>
                         </ul>
                     </div>
                     <div>
                         <h5 class="font-semibold text-sm mb-2 text-gray-800 dark:text-white flex items-center gap-2">
-                            <i data-lucide="calendar-check" class="w-4 h-4 text-amber-500"></i> Today's Collections
+                            <i data-lucide="calendar-check" class="w-4 h-4 text-amber-500"></i> Cobranças de hoje
                         </h5>
                         <p class="text-sm text-gray-600 dark:text-slate-400">
                             List of all payments due today (based on the amortization schedule).
@@ -43,7 +43,7 @@ const HelpPage = {
                     </div>
                     <div>
                         <h5 class="font-semibold text-sm mb-2 text-gray-800 dark:text-white flex items-center gap-2">
-                            <i data-lucide="trending-up" class="w-4 h-4 text-green-500"></i> Recent Payments
+                            <i data-lucide="trending-up" class="w-4 h-4 text-green-500"></i> Últimos pagamentos
                         </h5>
                         <p class="text-sm text-gray-600 dark:text-slate-400">
                             The last 5 payments recorded in the system with client name, date and amount.
@@ -60,16 +60,16 @@ const HelpPage = {
                 <div class="space-y-4 text-sm text-gray-600 dark:text-slate-400">
                     <div>
                         <h5 class="font-semibold mb-2 text-gray-800 dark:text-white">Create a Client</h5>
-                        <p>Click <strong>"New Client"</strong> (blue button top right). Fill in:</p>
+                        <p>Click <strong>"Novo cliente"</strong> (blue button top right). Fill in:</p>
                         <ul class="mt-2 space-y-1 ml-4">
                             <li>• <strong>First Name / Last Name</strong> — required</li>
                             <li>• <strong>Address</strong> — optional</li>
                             <li>• <strong>Phone</strong> — optional but recommended for collections</li>
                             <li>• <strong>Rating</strong> — 1 to 5 stars (your client assessment)</li>
-                            <li>• <strong>Referred By</strong> — if this client was referred by another existing client (automatically generates a commission)</li>
+                            <li>• <strong>Indicado por</strong> — if this client was referred by another existing client (automatically generates a commission)</li>
                         </ul>
                         <div class="help-tip mt-2">
-                            <strong>Tip:</strong> The client ID is generated automatically in the format <code>PH-YYYY-NNN</code>.
+                            <strong>Dica:</strong> o código do cliente é gerado no formato <code>PC-AAAA-NNN</code>.
                         </div>
                     </div>
                     <div>
@@ -93,7 +93,7 @@ const HelpPage = {
                             <li>• <strong>"Upload"</strong> → Imports any file from the computer</li>
                         </ul>
                         <div class="help-tip mt-2">
-                            <strong>Tip:</strong> If the camera does not work, allow PH-Lending under macOS System Settings, Privacy & Security, Camera.
+                            <strong>Dica:</strong> se a câmera não abrir, permita o Prazo Certo em Ajustes do macOS, Privacidade e Segurança, Câmera.
                         </div>
                     </div>
                 </div>
@@ -111,7 +111,7 @@ const HelpPage = {
                         <ul class="mt-2 space-y-2 ml-4">
                             <li>• <strong>Principal (${UI.currencyCode()})</strong> — borrowed amount (capital)</li>
                             <li>• <strong>Interest Rate (%)</strong> — choose whether the entered rate is monthly or for the full term; the contract stores the full-term rate</li>
-                            <li>• <strong>Interest Type</strong>:
+                            <li>• <strong>Tipo de juros</strong>:
                                 <ul class="ml-4 mt-1 space-y-1">
                                     <li>→ <strong>Fixed Rate</strong>: interest calculated once on the total capital. Equal installments. <em>Ex: ${UI.formatCurrency(10000)} at 3%/month × 6 months = ${UI.formatCurrency(1800)} interest → ${UI.formatCurrency(1966.67)}/month</em></li>
                                     <li>→ <strong>Declining Balance</strong>: interest recalculated each month on the remaining capital. Decreasing installments.</li>
@@ -131,7 +131,7 @@ const HelpPage = {
                         </div>
                     </div>
                     <div>
-                        <h5 class="font-semibold mb-2 text-gray-800 dark:text-white">Amortization Schedule</h5>
+                        <h5 class="font-semibold mb-2 text-gray-800 dark:text-white">Carnê / amortização</h5>
                         <p>In the Loan Detail view, the table shows for each month:</p>
                         <ul class="mt-2 space-y-1 ml-4">
                             <li>• <strong>Due Date</strong> — exact due date</li>
@@ -166,7 +166,7 @@ const HelpPage = {
                         <ul class="mt-2 space-y-1 ml-4">
                             <li>• <strong>Amount (${UI.currencyCode()})</strong> — amount received (not necessarily equal to the monthly installment)</li>
                             <li>• <strong>Payment Date</strong> — actual payment date (today by default)</li>
-                            <li>• <strong>Method</strong> — Cash / GCash / Bank Transfer / Check</li>
+                            <li>• <strong>Forma</strong> — Dinheiro / PIX / Transferência / Boleto / Cartão</li>
                             <li>• <strong>Notes</strong> — reference, transaction number, etc.</li>
                         </ul>
                         <div class="help-tip mt-2">
@@ -186,7 +186,7 @@ const HelpPage = {
                             <li>• Payment details and receipt number</li>
                             <li>• Signature and date</li>
                         </ul>
-                        <p class="mt-2">The PDF opens automatically in Preview/Adobe Reader. Files are saved in <code>~/Library/Application Support/PH-Lending/pdfs/</code></p>
+                        <p class="mt-2">The PDF opens automatically in Preview/Adobe Reader. Files are saved in <code>~/Library/Application Support/PrazoCerto/pdfs/</code></p>
                     </div>
                     <div>
                         <h5 class="font-semibold mb-2 text-gray-800 dark:text-white">"Payments" Page</h5>
@@ -287,7 +287,7 @@ const HelpPage = {
         {
             icon: 'calendar',
             color: 'text-blue-400',
-            title: 'Collection Calendar',
+            title: 'Agenda de cobrança',
             content: `
                 <div class="space-y-4 text-sm text-gray-600 dark:text-slate-400">
                     <div>
@@ -312,7 +312,7 @@ const HelpPage = {
         {
             icon: 'gift',
             color: 'text-amber-400',
-            title: 'Referral Commissions',
+            title: 'Comissões de indicação',
             content: `
                 <div class="space-y-4 text-sm text-gray-600 dark:text-slate-400">
                     <div>
@@ -321,15 +321,15 @@ const HelpPage = {
                     </div>
                     <div>
                         <h5 class="font-semibold mb-2 text-gray-800 dark:text-white">Configuration</h5>
-                        <p>In Settings → Loan Defaults & Commission:</p>
+                        <p>In Settings → Juros padrão e comissão:</p>
                         <ul class="mt-2 space-y-1 ml-4">
                             <li>• <strong>% of Principal</strong> — commission calculated as a percentage of the new loan capital</li>
-                            <li>• <strong>Fixed Amount</strong> — fixed amount per referral in the selected currency</li>
+                            <li>• <strong>Valor fixo</strong> — fixed amount per referral in the selected currency</li>
                         </ul>
                     </div>
                     <div>
                         <h5 class="font-semibold mb-2 text-gray-800 dark:text-white">Managing Commissions</h5>
-                        <p>The "Referral Commissions" page (left menu) shows all commissions with:</p>
+                        <p>The "Comissões de indicação" page (left menu) shows all commissions with:</p>
                         <ul class="mt-2 space-y-1 ml-4">
                             <li>• The referrer and referred client names</li>
                             <li>• The relevant loan and commission amount</li>
@@ -337,7 +337,7 @@ const HelpPage = {
                         </ul>
                     </div>
                     <div class="help-tip">
-                        <strong>Tip:</strong> To create a referral link, select "Referred By" when creating the referred client.
+                        <strong>Tip:</strong> To create a referral link, select "Indicado por" when creating the referred client.
                     </div>
                 </div>
             `
@@ -356,17 +356,17 @@ const HelpPage = {
                         <h5 class="font-semibold mb-2 text-gray-800 dark:text-white">Loan Default Values</h5>
                         <ul class="mt-1 space-y-1 ml-4">
                             <li>• <strong>Default Interest Rate</strong> — pre-filled rate in the loan creation form</li>
-                            <li>• <strong>Interest Type</strong> — Fixed or Declining pre-selected</li>
+                            <li>• <strong>Tipo de juros</strong> — Fixed or Declining pre-selected</li>
                             <li>• <strong>Commission Type/Rate</strong> — settings for referral commissions</li>
                         </ul>
                     </div>
                     <div>
                         <h5 class="font-semibold mb-2 text-gray-800 dark:text-white">Excel Export</h5>
-                        <p>Generates a <code>.xlsx</code> file with 4 tabs: Clients, Loans, Payments, Referral Commissions. The file opens automatically and is saved in <code>~/Library/Application Support/PH-Lending/exports/</code></p>
+                        <p>Generates a <code>.xlsx</code> file with 4 tabs: Clients, Loans, Payments, Comissões de indicação. The file opens automatically and is saved in <code>~/Library/Application Support/PrazoCerto/exports/</code></p>
                     </div>
                     <div>
                         <h5 class="font-semibold mb-2 text-gray-800 dark:text-white">Local Backup</h5>
-                        <p>Creates 3 files in <code>~/Library/Application Support/PH-Lending/backups/</code>:</p>
+                        <p>Creates 3 files in <code>~/Library/Application Support/PrazoCerto/backups/</code>:</p>
                         <ul class="mt-1 space-y-1 ml-4">
                             <li>• <code>.db</code> — copy of the SQLite database</li>
                             <li>• <code>.xlsx</code> — full Excel export</li>
@@ -390,7 +390,7 @@ const HelpPage = {
                     </div>
                     <div>
                         <h5 class="font-semibold mb-2 text-gray-800 dark:text-white">Demo Mode</h5>
-                        <p>The application opens on an empty personal database. Use <strong>Try demo</strong> in the top-right toolbar to temporarily load fictitious data. Leaving the demo returns to the personal database, and restarting the application always starts outside demo mode.</p>
+                        <p>The application opens on an empty personal database. Use <strong>Testar demo</strong> in the top-right toolbar to temporarily load fictitious data. Leaving the demo returns to the personal database, and restarting the application always starts outside demo mode.</p>
                     </div>
                 </div>
             `
@@ -442,7 +442,7 @@ const HelpPage = {
                             <li>• Click "Print Selected" to open all PDFs at once</li>
                         </ul>
                     </div>
-                    <p class="text-xs text-gray-400 dark:text-slate-500">All PDFs are saved in: <code>~/Library/Application Support/PH-Lending/pdfs/</code></p>
+                    <p class="text-xs text-gray-400 dark:text-slate-500">All PDFs are saved in: <code>~/Library/Application Support/PrazoCerto/pdfs/</code></p>
                 </div>
             `
         },
@@ -453,7 +453,7 @@ const HelpPage = {
             content: `
                 <div class="space-y-4 text-sm text-gray-600 dark:text-slate-400">
                     <div>
-                        <h5 class="font-semibold mb-2 text-gray-800 dark:text-white">Dark / Light Mode</h5>
+                        <h5 class="font-semibold mb-2 text-gray-800 dark:text-white">Dark / Modo claro</h5>
                         <p><i data-lucide="moon" class="w-3 h-3 inline"></i> / <i data-lucide="sun" class="w-3 h-3 inline"></i> button in the top bar. Preference saved automatically.</p>
                     </div>
                     <div>
@@ -490,11 +490,11 @@ const HelpPage = {
 
     render() {
         const content = document.getElementById('page-content');
-        const dataFolder = App.isDemoEdition ? 'PH-Lending Demo' : 'PH-Lending';
+        const dataFolder = App.isDemoEdition ? 'PrazoCerto Demo' : 'PrazoCerto';
         const sections = this.sections.map(section => ({
             ...section,
             content: section.content.replaceAll(
-                '~/Library/Application Support/PH-Lending/',
+                '~/Library/Application Support/PrazoCerto/',
                 `~/Library/Application Support/${dataFolder}/`
             )
         }));
@@ -509,9 +509,9 @@ const HelpPage = {
                             <i data-lucide="book-open" class="w-7 h-7 text-white"></i>
                         </div>
                         <div>
-                            <h2 class="text-xl font-bold text-gray-800 dark:text-white">${App.appName} — Complete Guide</h2>
+                            <h2 class="text-xl font-bold text-gray-800 dark:text-white">${App.appName} — Manual</h2>
                             <p class="text-sm text-gray-500 dark:text-slate-400 mt-0.5">
-                                Everything you need to know to use the application like a pro. Click each section to expand.
+                                Tudo para usar o app no dia a dia do crediário. Clique em cada seção para abrir.
                             </p>
                         </div>
                     </div>

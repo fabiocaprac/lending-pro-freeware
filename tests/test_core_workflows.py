@@ -25,10 +25,10 @@ PROJECT_MODULES = [
 
 def app_support_dir(home):
     if sys.platform == "win32":
-        return os.path.join(home, "PH-Lending")
+        return os.path.join(home, "PrazoCerto")
     if sys.platform == "darwin":
-        return os.path.join(home, "Library", "Application Support", "PH-Lending")
-    return os.path.join(home, ".local", "share", "PH-Lending")
+        return os.path.join(home, "Library", "Application Support", "PrazoCerto")
+    return os.path.join(home, ".local", "share", "PrazoCerto")
 
 
 def fresh_modules(tmp_path, monkeypatch):
@@ -54,7 +54,7 @@ def test_currency_setting_is_validated_and_persisted(tmp_path, monkeypatch):
     assert api_obj.get_settings()["currency"] == "EUR"
 
     assert api_obj.save_settings({"currency": "not-a-currency"}) is True
-    assert api_obj.get_settings()["currency"] == "PHP"
+    assert api_obj.get_settings()["currency"] == "BRL"
 
 
 def test_light_theme_is_default_and_dark_theme_remains_available():
@@ -63,7 +63,7 @@ def test_light_theme_is_default_and_dark_theme_remains_available():
     app_source = (project_root / "web" / "app.js").read_text(encoding="utf-8")
     styles_source = (project_root / "web" / "styles.css").read_text(encoding="utf-8")
 
-    assert '<html lang="en">' in index_source
+    assert '<html lang="pt-BR">' in index_source
     assert "darkMode: false" in app_source
     assert "savedTheme === 'dark'" in app_source
     assert ".dark {" in styles_source
@@ -552,7 +552,7 @@ def test_demo_data_uses_production_rates_methods_and_allocations(tmp_path, monke
     conn = database.get_connection()
     invalid_methods = conn.execute("""
         SELECT COUNT(*) FROM payments
-        WHERE payment_method NOT IN ('cash', 'gcash', 'bank_transfer', 'check')
+        WHERE payment_method NOT IN ('cash', 'pix', 'bank_transfer', 'boleto', 'card', 'check')
     """).fetchone()[0]
     payment_total = conn.execute(
         "SELECT ROUND(COALESCE(SUM(amount), 0), 2) FROM payments WHERE voided_at IS NULL"
@@ -599,13 +599,13 @@ def test_demo_distribution_starts_empty_and_demo_is_temporary(tmp_path, monkeypa
 
     mode = api_obj.get_app_mode()
     assert mode == {
-        "name": "Lending Pro Freeware",
+        "name": "Prazo Certo",
         "demo_only": False,
         "demo_edition": True,
         "demo_active": False,
     }
     assert api_obj.get_demo_status() is False
-    assert database.get_db_path().endswith("PH-Lending Demo/phlending.db")
+    assert database.get_db_path().endswith("PrazoCerto Demo/phlending.db")
     assert api_obj.get_all_clients_simple() == []
 
     switched = api_obj.toggle_demo_mode(True)
@@ -615,7 +615,7 @@ def test_demo_distribution_starts_empty_and_demo_is_temporary(tmp_path, monkeypa
         "demo_only": True,
         "demo_edition": True,
     }
-    assert database.get_db_path().endswith("PH-Lending Demo/phlending_demo.db")
+    assert database.get_db_path().endswith("PrazoCerto Demo/phlending_demo.db")
     assert len(api_obj.get_all_clients_simple()) > 0
     assert api_obj.get_profiles() == []
     assert api_obj.restore_backup("anything")["success"] is False
@@ -653,7 +653,7 @@ def test_demo_distribution_starts_empty_and_demo_is_temporary(tmp_path, monkeypa
     restarted, _, restarted_database, _ = fresh_api(tmp_path, monkeypatch)
     assert restarted.get_demo_status() is False
     assert restarted.get_app_mode()["demo_only"] is False
-    assert restarted_database.get_db_path().endswith("PH-Lending Demo/phlending.db")
+    assert restarted_database.get_db_path().endswith("PrazoCerto Demo/phlending.db")
     assert restarted.get_all_clients_simple() == []
 
 
@@ -797,3 +797,58 @@ def test_shutdown_stops_local_server_once(tmp_path, monkeypatch):
     repeated = api_obj.shutdown_services(force_backup=False)
     assert repeated["already_stopped"] is True
     assert server.shutdown_calls == 1
+
+
+def test_brazilian_commercial_defaults(tmp_path, monkeypatch):
+    api_obj, _, _, _ = fresh_api(tmp_path, monkeypatch)
+    settings = api_obj.get_settings()
+    assert settings["currency"] == "BRL"
+    assert settings["language"] == "pt-BR"
+    assert settings["company_name"] == "Prazo Certo"
+    assert api_obj.get_app_mode()["name"] == "Prazo Certo"
+
+    templates = api_obj.get_sms_templates()
+    names = {t["name"] for t in templates}
+    assert "Lembrete de parcela" in names
+    assert all("Please settle" not in t["text"] for t in templates)
+
+    from currency_utils import format_money
+    assert format_money(1234.5, "BRL") == "R$ 1.234,50"
+
+
+def test_cpf_is_stored_and_searchable(tmp_path, monkeypatch):
+    api_obj, _, _, _ = fresh_api(tmp_path, monkeypatch)
+    client_id = api_obj.create_client({
+        "first_name": "Maria",
+        "last_name": "Silva",
+        "cpf": "12345678901",
+        "contact": "11987654321",
+    })
+    client = api_obj.get_client(client_id)
+    assert client["cpf"] == "123.456.789-01"
+    assert client_id.startswith("PC-")
+
+    found = api_obj.get_clients("123.456.789-01")
+    assert found["total"] == 1
+    assert found["clients"][0]["id"] == client_id
+
+
+def test_brazilian_payment_methods_are_accepted(tmp_path, monkeypatch):
+    api_obj, _, _, _ = fresh_api(tmp_path, monkeypatch)
+    client_id = make_client(api_obj)
+    created = api_obj.create_loan(client_id, 1200, 12, "fixed", 3, "2026-01-01")
+    loan_id = created["loan_id"]
+
+    pix_id = api_obj.record_payment(loan_id, 100, "pix", "2026-02-01")
+    boleto_id = api_obj.record_payment(loan_id, 100, "boleto", "2026-02-02")
+    card_id = api_obj.record_payment(loan_id, 100, "cartão", "2026-02-03")
+    gcash_id = api_obj.record_payment(loan_id, 100, "gcash", "2026-02-04")
+
+    assert isinstance(pix_id, int)
+    assert isinstance(boleto_id, int)
+    assert isinstance(card_id, int)
+    assert isinstance(gcash_id, int)
+
+    payments = api_obj.get_loan(loan_id)["payments"]
+    methods = {p["payment_method"] for p in payments}
+    assert methods == {"pix", "boleto", "card"}

@@ -243,7 +243,7 @@ def restore_local_backup(backup_name):
 
 DRIVE_CREDENTIALS_PATH = os.path.join(APP_SUPPORT_DIR, "google_credentials.json")
 DRIVE_TOKEN_PATH = os.path.join(APP_SUPPORT_DIR, "google_token.json")
-DRIVE_FOLDER_NAME = "PH-Lending Backups"
+DRIVE_FOLDER_NAME = "PrazoCerto Backups"
 
 
 def is_drive_configured():

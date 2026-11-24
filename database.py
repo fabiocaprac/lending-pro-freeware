@@ -1,5 +1,5 @@
 """
-Lending Pro Freeware — Database Module
+Prazo Certo — módulo de banco de dados
 SQLite3 schema initialization, connection management, migrations, and profile management.
 """
 
@@ -41,8 +41,8 @@ def _load_profiles_meta():
         "profiles": [
             {
                 "id": "default",
-                "name": "Main Profile",
-                "description": "Default lending profile",
+                "name": "Perfil principal",
+                "description": "Perfil padrão de crediário",
                 "db_file": "phlending.db",
                 "created_at": datetime.now().isoformat(),
                 "color": "#007AFF"
@@ -272,6 +272,7 @@ def init_database():
             employer        TEXT DEFAULT '',
             occupation      TEXT DEFAULT '',
             gender          TEXT DEFAULT '',
+            cpf             TEXT DEFAULT '',
             created_at      TEXT NOT NULL,
             updated_at      TEXT NOT NULL,
             FOREIGN KEY (referred_by) REFERENCES clients(id) ON DELETE SET NULL
@@ -336,7 +337,7 @@ def init_database():
             amount          REAL NOT NULL,
             payment_date    TEXT NOT NULL,
             payment_method  TEXT NOT NULL DEFAULT 'cash'
-                            CHECK(payment_method IN ('cash', 'gcash', 'bank_transfer', 'check')),
+                            CHECK(payment_method IN ('cash', 'pix', 'bank_transfer', 'boleto', 'card', 'check')),
             notes           TEXT DEFAULT '',
             voided_at       TEXT DEFAULT NULL,
             void_reason     TEXT DEFAULT '',
@@ -499,8 +500,8 @@ def init_database():
         "commission_amount": "500",
         "default_interest_rate": "5.0",
         "default_interest_type": "fixed",
-        "currency": "PHP",
-        "language": "en",
+        "currency": "BRL",
+        "language": "pt-BR",
         "dark_mode": "true",
         "company_name": APP_NAME,
         "company_phone": "",
@@ -575,6 +576,65 @@ def init_database():
         """)
         cursor.execute("DROP TABLE payment_allocations_legacy")
 
+    # ── Brazilian payment methods (PIX, boleto, cartão) ──────────
+    cursor.execute("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'payments'")
+    payments_sql = (cursor.fetchone() or [None])[0] or ""
+    if "pix" not in payments_sql or "boleto" not in payments_sql:
+        cursor.execute("ALTER TABLE payments RENAME TO payments_legacy")
+        cursor.execute("""
+            CREATE TABLE payments (
+                id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                loan_id         INTEGER NOT NULL,
+                amount          REAL NOT NULL,
+                payment_date    TEXT NOT NULL,
+                payment_method  TEXT NOT NULL DEFAULT 'cash'
+                                CHECK(payment_method IN ('cash', 'pix', 'bank_transfer', 'boleto', 'card', 'check')),
+                notes           TEXT DEFAULT '',
+                voided_at       TEXT DEFAULT NULL,
+                void_reason     TEXT DEFAULT '',
+                created_at      TEXT NOT NULL,
+                FOREIGN KEY (loan_id) REFERENCES loans(id) ON DELETE CASCADE
+            )
+        """)
+        cursor.execute("""
+            INSERT INTO payments (id, loan_id, amount, payment_date, payment_method, notes, voided_at, void_reason, created_at)
+            SELECT id, loan_id, amount, payment_date,
+                   CASE payment_method
+                        WHEN 'gcash' THEN 'pix'
+                        WHEN 'bank' THEN 'bank_transfer'
+                        ELSE payment_method
+                   END,
+                   notes, voided_at, void_reason, created_at
+            FROM payments_legacy
+        """)
+        cursor.execute("DROP TABLE payments_legacy")
+
+        cursor.execute("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'payment_allocations'")
+        allocation_sql = (cursor.fetchone() or [None])[0] or ""
+        if "payments_legacy" in allocation_sql:
+            cursor.execute("ALTER TABLE payment_allocations RENAME TO payment_allocations_legacy")
+            cursor.execute("""
+                CREATE TABLE payment_allocations (
+                    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                    payment_id      INTEGER NOT NULL,
+                    schedule_id     INTEGER NOT NULL,
+                    amount          REAL NOT NULL,
+                    created_at      TEXT NOT NULL,
+                    FOREIGN KEY (payment_id)  REFERENCES payments(id) ON DELETE CASCADE,
+                    FOREIGN KEY (schedule_id) REFERENCES amortization_schedule(id) ON DELETE CASCADE,
+                    UNIQUE(payment_id, schedule_id)
+                )
+            """)
+            cursor.execute("""
+                INSERT OR IGNORE INTO payment_allocations
+                    (id, payment_id, schedule_id, amount, created_at)
+                SELECT pa.id, pa.payment_id, pa.schedule_id, pa.amount, pa.created_at
+                FROM payment_allocations_legacy pa
+                JOIN payments p ON p.id = pa.payment_id
+                JOIN amortization_schedule a ON a.id = pa.schedule_id
+            """)
+            cursor.execute("DROP TABLE payment_allocations_legacy")
+
     # ── Useful indexes ───────────────────────────────────────────
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_loans_client ON loans(client_id)")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_loans_status ON loans(status)")
@@ -611,6 +671,7 @@ def init_database():
         ("clients",  "employer",          "ALTER TABLE clients ADD COLUMN employer TEXT DEFAULT ''"),
         ("clients",  "occupation",        "ALTER TABLE clients ADD COLUMN occupation TEXT DEFAULT ''"),
         ("clients",  "gender",            "ALTER TABLE clients ADD COLUMN gender TEXT DEFAULT ''"),
+        ("clients",  "cpf",               "ALTER TABLE clients ADD COLUMN cpf TEXT DEFAULT ''"),
         # Loan extensions: frequency, fees, upfront interest, TAEG
         ("loans",    "repayment_frequency", "ALTER TABLE loans ADD COLUMN repayment_frequency TEXT DEFAULT 'monthly'"),
         ("loans",    "processing_fee",      "ALTER TABLE loans ADD COLUMN processing_fee REAL DEFAULT 0"),
@@ -749,6 +810,7 @@ def init_database():
         "20260727_loan_fees_frequency",
         "20260727_auto_penalty_settings",
         "20260727_startup_login",
+        "20261124_brazil_commercial",
     ]:
         cursor.execute(
             "INSERT OR IGNORE INTO schema_migrations (version, applied_at) VALUES (?, ?)",
@@ -760,9 +822,9 @@ def init_database():
 
 
 def generate_client_id():
-    """Generate the next client ID in format PH-YYYY-NNN."""
+    """Generate the next client ID in format PC-YYYY-NNN."""
     year = datetime.now().strftime("%Y")
-    prefix = f"PH-{year}-"
+    prefix = f"PC-{year}-"
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(

@@ -1,5 +1,5 @@
 /**
- * Lending Pro Freeware — About
+ * Prazo Certo — About
  * Product information and contact for custom development requests.
  */
 const AboutPage = {
@@ -7,7 +7,7 @@ const AboutPage = {
         const content = document.getElementById('page-content');
 
         let version = '1.5.1';
-        let appName = 'Lending Pro Freeware';
+        let appName = 'Prazo Certo';
         try {
             const info = await App.api('get_app_info');
             if (info) {
@@ -24,17 +24,17 @@ const AboutPage = {
                 <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5">
                     <div class="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 overflow-hidden"
                          style="background:#071b3a; box-shadow: 0 6px 18px rgba(0,0,0,0.18);">
-                        <img src="assets/lending-pro-mark.png" class="w-full h-full object-cover" alt="Lending Pro logo">
+                        <img src="assets/lending-pro-mark.png" class="w-full h-full object-cover" alt="Prazo Certo logo">
                     </div>
                     <div class="text-center sm:text-left min-w-0">
                         <h2 class="text-xl font-bold" style="color: var(--text-primary);">${appName}</h2>
                         <p class="text-sm mt-1" style="color: var(--text-secondary);">
-                            Private, offline management of clients, loans, repayments and collections.
+                            Gestão offline de clientes, empréstimos, parcelas e cobrança.
                         </p>
                         <div class="flex flex-wrap items-center gap-2 mt-3 justify-center sm:justify-start">
                             <span class="badge badge-active">Version ${version}</span>
                             <span class="badge badge-pending">100% offline</span>
-                            <span class="badge" style="background:rgba(52,199,89,0.12); color:#1A8F3A;">No subscription</span>
+                            <span class="badge" style="background:rgba(52,199,89,0.12); color:#1A8F3A;">Sem mensalidade</span>
                         </div>
                     </div>
                 </div>
@@ -48,14 +48,14 @@ const AboutPage = {
                         <i data-lucide="wrench" class="w-5 h-5" style="color: var(--accent);"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-base" style="color: var(--text-primary);">Tailored to your business</h3>
-                        <p class="text-xs" style="color: var(--text-tertiary);">Professional software customization</p>
+                        <h3 class="font-bold text-base" style="color: var(--text-primary);">Sob medida para o seu negócio</h3>
+                        <p class="text-xs" style="color: var(--text-tertiary);">Personalização profissional</p>
                     </div>
                 </div>
                 <p class="text-sm mb-5" style="color: var(--text-secondary);">
-                    Every lending business has its own rules. If you need a specific field,
-                    a different interest calculation, a custom document or a workflow tailored
-                    to the way you work, the software can be adapted for you.
+                    Cada operação de crediário tem suas regras. Se precisar de um campo,
+                    outro cálculo de juros, um documento próprio ou um fluxo
+                    adaptado ao seu jeito de trabalhar, o sistema pode ser personalizado.
                 </p>
 
                 <!-- Carte de contact -->
@@ -66,16 +66,16 @@ const AboutPage = {
                             <i data-lucide="messages-square" class="w-6 h-6" style="color: var(--accent);"></i>
                         </div>
                         <div class="flex-1 min-w-0 text-center sm:text-left">
-                            <p class="text-xs font-semibold uppercase tracking-wider mb-0.5" style="color: var(--text-tertiary);">Public support</p>
+                            <p class="text-xs font-semibold uppercase tracking-wider mb-0.5" style="color: var(--text-tertiary);">Suporte público</p>
                             <p class="font-semibold text-sm" style="color: var(--text-primary);">GitHub Issues</p>
                             <p class="text-xs mt-1" style="color: var(--text-secondary);">
-                                Report a problem or propose an improvement without exposing private customer data.
+                                Relate um problema sem enviar dados de clientes.
                             </p>
                         </div>
                         <button onclick="AboutPage.openSupport('${supportUrl}')"
                                 class="btn btn-primary flex items-center gap-2 flex-shrink-0">
                             <i data-lucide="external-link" class="w-4 h-4"></i>
-                            <span>Open support</span>
+                            <span>Abrir suporte</span>
                         </button>
                     </div>
                 </div>
@@ -83,14 +83,14 @@ const AboutPage = {
 
             <!-- Détails de l'application -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 stagger">
-                ${AboutPage._featureCard('shield-check', 'Complete privacy',
-                    'Your data stays on your computer. No uploads, no cloud account and no telemetry.',
+                ${AboutPage._featureCard('shield-check', 'Privacidade total',
+                    'Os dados ficam no seu computador. Sem envio, sem conta na nuvem e sem telemetria.',
                     'rgba(52,199,89,0.12)', '#1A8F3A')}
-                ${AboutPage._featureCard('calculator', 'Accurate accounting',
-                    'Cent-exact calculations, reconciled schedules and multiple currencies.',
+                ${AboutPage._featureCard('calculator', 'Contas certinhas',
+                    'Cálculo em centavos, carnê conferido e várias moedas.',
                     'rgba(255,149,0,0.12)', '#B86700')}
-                ${AboutPage._featureCard('file-text', "Professional documents",
-                    "Contracts, receipts and amortization schedules generated in one click.",
+                ${AboutPage._featureCard('file-text', "Documentos profissionais",
+                    "Contratos, recibos e carnês gerados em um clique.",
                     'rgba(88,86,214,0.12)', '#5856D6')}
             </div>
 
@@ -120,10 +120,10 @@ const AboutPage = {
         try {
             const res = await App.api('open_url', url);
             if (res && res.success === false) {
-                UI.toast('Could not open GitHub Issues.', 'warning');
+                UI.toast('Não foi possível abrir o suporte.', 'warning');
             }
         } catch (e) {
-            UI.toast('Support: github.com/aston76/lending-pro-freeware/issues', 'info');
+            UI.toast('Suporte técnico pelo repositório do projeto.', 'info');
         }
     }
 };

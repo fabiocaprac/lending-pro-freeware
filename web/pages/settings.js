@@ -1,5 +1,5 @@
 /**
- * Lending Pro Freeware — Settings Page
+ * Prazo Certo — Settings Page
  * Company settings with logo, loan defaults, export, backup, and Google Drive sync.
  */
 const SettingsPage = {
@@ -28,11 +28,11 @@ const SettingsPage = {
                             <i data-lucide="users-round" class="w-4 h-4" style="color:var(--accent)"></i> Profiles
                         </h3>
                         <button onclick="SettingsPage.showCreateProfileModal()" class="btn btn-primary btn-sm">
-                            <i data-lucide="plus" class="w-3.5 h-3.5"></i> New Profile
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Novo perfil
                         </button>
                     </div>
 
-                    <!-- Active profile badge -->
+                    <!-- Perfil ativo badge -->
                     <div class="flex items-center gap-3 mb-4 px-4 py-3 rounded-xl" style="background:var(--surface-2); border:0.5px solid var(--surface-1);">
                         <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
                              style="background:${activeProfile.color || 'var(--accent)'}20;">
@@ -40,7 +40,7 @@ const SettingsPage = {
                         </div>
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-semibold truncate" style="color:var(--text-primary)">${activeProfile.name}</p>
-                            <p class="text-xs" style="color:var(--text-tertiary)">${activeProfile.description || 'Active profile'} · ${activeProfile.client_count || 0} clients · ${activeProfile.loan_count || 0} loans</p>
+                            <p class="text-xs" style="color:var(--text-tertiary)">${activeProfile.description || 'Perfil ativo'} · ${activeProfile.client_count || 0} clients · ${activeProfile.loan_count || 0} loans</p>
                         </div>
                         <span class="text-[10px] px-2 py-0.5 rounded-full font-bold tracking-wider"
                               style="background:rgba(52,199,89,0.12); color:#1A8F3A;">ACTIVE</span>
@@ -63,7 +63,7 @@ const SettingsPage = {
                                         <span class="text-[10px] px-1.5 py-0.5 rounded font-semibold"
                                               style="background:rgba(52,199,89,0.12); color:#1A8F3A;">✓</span>
                                     ` : `
-                                        <button onclick="SettingsPage.switchProfile('${p.id}')" class="btn btn-ghost btn-sm text-xs" title="Switch to this profile">
+                                        <button onclick="SettingsPage.switchProfile('${p.id}')" class="btn btn-ghost btn-sm text-xs" title="Trocar para este perfil">
                                             <i data-lucide="arrow-right-left" class="w-3 h-3"></i> Switch
                                         </button>
                                     `}
@@ -92,8 +92,8 @@ const SettingsPage = {
                                         <i data-lucide="lock" class="w-4 h-4 text-white"></i>
                                     </div>
                                     <div>
-                                        <p class="text-sm font-medium" style="color:var(--text-primary)">Profile Password</p>
-                                        <p class="text-xs" style="color:var(--text-tertiary)">Protect reset, deletion and profile switching</p>
+                                        <p class="text-sm font-medium" style="color:var(--text-primary)">Senha do perfil</p>
+                                        <p class="text-xs" style="color:var(--text-tertiary)">Protege zerar, excluir e trocar de perfil</p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-2">
@@ -115,11 +115,11 @@ const SettingsPage = {
                                         <i data-lucide="log-in" class="w-4 h-4 text-white"></i>
                                     </div>
                                     <div>
-                                        <p class="text-sm font-medium" style="color:var(--text-primary)">Login at Startup</p>
-                                        <p class="text-xs" style="color:var(--text-tertiary)">Show the secure opening screen when this profile starts</p>
+                                        <p class="text-sm font-medium" style="color:var(--text-primary)">Login ao abrir</p>
+                                        <p class="text-xs" style="color:var(--text-tertiary)">Pede senha ao abrir este perfil</p>
                                     </div>
                                 </div>
-                                <label class="apple-toggle" title="Requires a profile password">
+                                <label class="apple-toggle" title="Exige senha do perfil">
                                     <input type="checkbox" id="startup-login-toggle"
                                            onchange="SettingsPage.toggleStartupLogin(this.checked)">
                                     <div class="apple-toggle-track"></div>
@@ -131,18 +131,18 @@ const SettingsPage = {
                         <button onclick="SettingsPage.resetProfileData()" class="btn btn-sm flex items-center gap-1.5"
                                 style="background:rgba(255,59,48,0.08); color:var(--apple-red); border:1px solid rgba(255,59,48,0.2);">
                             <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
-                            Reset Current Profile (erase all data)
+                            Zerar perfil atual (apagar dados)
                         </button>
                         <p class="text-[11px]" style="color:var(--text-tertiary)">
-                            Warning: this permanently deletes all data in <strong>${activeProfile.name}</strong>. A backup is created first. Type <code style="background:var(--surface-2); padding:1px 4px; border-radius:4px;">RESET</code> to confirm.
+                            Atenção: isso apaga todos os dados de <strong>${activeProfile.name}</strong>. Um backup é criado antes. Digite <code style="background:var(--surface-2); padding:1px 4px; border-radius:4px;">RESET</code> para confirmar.
                         </p>
                     </div>
                 </div>` : ''}
 
-                <!-- Company Settings + Logo -->
+                <!-- Dados da empresa + Logo -->
                 <div class="glass-card p-6">
                     <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-                        <i data-lucide="building-2" class="w-5 h-5 text-blue-500"></i> Company Settings
+                        <i data-lucide="building-2" class="w-5 h-5 text-blue-500"></i> Dados da empresa
                     </h3>
                     <form id="company-form" onsubmit="SettingsPage.saveCompany(event)" class="space-y-4">
                         <!-- Logo Upload -->
@@ -164,8 +164,8 @@ const SettingsPage = {
                                 </div>`;
             })()}
                             <div class="min-w-0 flex-1">
-                                <p class="font-semibold text-sm text-gray-700 dark:text-slate-300 mb-1">Company Logo</p>
-                                <p class="text-xs text-gray-400 dark:text-slate-500 mb-3">Fills the square — use a square image for best results. Appears in sidebar and PDFs.</p>
+                                <p class="font-semibold text-sm text-gray-700 dark:text-slate-300 mb-1">Logotipo</p>
+                                <p class="text-xs text-gray-400 dark:text-slate-500 mb-3">Use uma imagem quadrada. Aparece na barra e nos PDFs.</p>
                                 <!-- Size picker -->
                                 <div class="flex items-center gap-2 mb-3">
                                     <span class="text-xs text-gray-500 dark:text-slate-400 font-medium">Size:</span>
@@ -180,94 +180,92 @@ const SettingsPage = {
                                 </div>
                                 <input type="file" id="logo-input" class="hidden" accept="image/*" onchange="SettingsPage.uploadLogo(event)">
                                 <button type="button" onclick="document.getElementById('logo-input').click()" class="btn btn-ghost btn-sm">
-                                    <i data-lucide="upload" class="w-3 h-3"></i> Upload Logo
+                                    <i data-lucide="upload" class="w-3 h-3"></i> Enviar logo
                                 </button>
                             </div>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Company Name</label>
-                                <input name="company_name" class="input" value="${settings.company_name || 'Lending Pro Freeware'}">
+                                <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Nome da empresa</label>
+                                <input name="company_name" class="input" value="${settings.company_name || 'Prazo Certo'}">
                             </div>
                             <div>
-                                <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Phone Number</label>
-                                <input name="company_phone" type="tel" class="input" placeholder="+41 79 123 45 67" value="${settings.company_phone || ''}">
+                                <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Telefone</label>
+                                <input name="company_phone" type="tel" class="input" placeholder="(11) 98765-4321" value="${settings.company_phone || ''}">
                             </div>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Email / Contact</label>
+                                <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">E-mail / contato</label>
                                 <input name="company_contact" class="input" placeholder="info@lending.com" value="${settings.company_contact || ''}">
                             </div>
                             <div>
-                                <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Currency</label>
+                                <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Moeda</label>
                                 <select name="currency" class="input select">
-                                    ${['PHP','EUR','USD','CHF','GBP','CAD','AUD','NZD','JPY','SGD','HKD','AED','SAR','INR','THB','MYR','IDR','VND','KRW','ZAR','MXN','BRL'].map(code =>
-                                        `<option value="${code}" ${(settings.currency || 'PHP') === code ? 'selected' : ''}>${code}</option>`
+                                    ${['BRL','USD','EUR','GBP','CHF','CAD','AUD','NZD','JPY','SGD','HKD','AED','SAR','INR','THB','MYR','IDR','VND','KRW','ZAR','MXN','PHP'].map(code =>
+                                        `<option value="${code}" ${(settings.currency || 'BRL') === code ? 'selected' : ''}>${code === 'BRL' ? 'BRL (R$)' : code}</option>`
                                     ).join('')}
                                 </select>
                             </div>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Donation Reminder Language</label>
+                                <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Idioma</label>
                                 <select name="language" class="input select">
-                                    ${[['en','English'],['fr','Français'],['es','Español'],['de','Deutsch'],['it','Italiano'],['pt','Português'],['nl','Nederlands'],['fil','Filipino'],['zh','中文'],['ja','日本語'],['ko','한국어'],['ar','العربية'],['hi','हिन्दी'],['th','ไทย'],['ms','Bahasa Melayu'],['id','Bahasa Indonesia'],['vi','Tiếng Việt']].map(([code, label]) =>
-                                        `<option value="${code}" ${(settings.language || 'en') === code ? 'selected' : ''}>${label}</option>`
-                                    ).join('')}
+                                    <option value="pt-BR" selected>Português (Brasil)</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Address</label>
+                                <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Endereço</label>
                                 <input name="company_address" class="input" value="${settings.company_address || ''}">
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-sm"><i data-lucide="save" class="w-4 h-4"></i> Save Company Info</button>
+                        <button type="submit" class="btn btn-primary btn-sm"><i data-lucide="save" class="w-4 h-4"></i> Salvar dados da empresa</button>
                     </form>
                 </div>
 
-                <!-- Loan Defaults & Commission -->
+                <!-- Juros padrão e comissão -->
                 <div class="glass-card p-6">
                     <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-                        <i data-lucide="sliders" class="w-5 h-5 text-purple-500"></i> Loan Defaults & Commission
+                        <i data-lucide="sliders" class="w-5 h-5 text-purple-500"></i> Juros padrão e comissão
                     </h3>
                     <form id="defaults-form" onsubmit="SettingsPage.saveLoanDefaults(event)" class="space-y-4">
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div>
-                            <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Default Monthly Interest Rate (%)</label>
+                            <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Juros mensais padrão (%)</label>
                                 <input name="default_interest_rate" type="number" class="input" step="0.01" min="0" inputmode="decimal"
                                        value="${settings.default_interest_rate || '5.0'}">
                             </div>
                             <div>
-                                <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Interest Type</label>
+                                <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Tipo de juros</label>
                                 <select name="default_interest_type" class="input select">
                                     <option value="fixed" ${settings.default_interest_type === 'fixed' ? 'selected' : ''}>Fixed</option>
                                     <option value="declining" ${settings.default_interest_type === 'declining' ? 'selected' : ''}>Declining</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Commission Type</label>
+                                <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Tipo de comissão</label>
                                 <select name="commission_type" class="input select" onchange="SettingsPage.toggleCommissionField(this.value)">
                                     <option value="percentage" ${(settings.commission_type || 'percentage') === 'percentage' ? 'selected' : ''}>% of Principal</option>
-                                    <option value="fixed_amount" ${settings.commission_type === 'fixed_amount' ? 'selected' : ''}>Fixed Amount (${UI.currencyCode()})</option>
+                                    <option value="fixed_amount" ${settings.commission_type === 'fixed_amount' ? 'selected' : ''}>Valor fixo (${UI.currencyCode()})</option>
                                 </select>
                             </div>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div id="commission-rate-field" class="${settings.commission_type === 'fixed_amount' ? 'hidden' : ''}">
-                                <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Commission Rate (%)</label>
+                                <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Percentual de comissão (%)</label>
                                 <input name="commission_rate" type="number" class="input" step="0.01" min="0" inputmode="decimal"
                                        value="${settings.commission_rate || '2.0'}">
                             </div>
                             <div id="commission-amount-field" class="${settings.commission_type !== 'fixed_amount' ? 'hidden' : ''}">
-                                <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Commission Amount (${UI.currencyCode()})</label>
+                                <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Valor da comissão (${UI.currencyCode()})</label>
                                 <input name="commission_amount" type="number" class="input" step="0.01" min="0" inputmode="decimal"
                                        value="${settings.commission_amount || '500'}">
                             </div>
                         </div>
 
-                        <!-- Referral Bonus -->
+                        <!-- Bônus de indicação -->
                         <div class="p-4 rounded-xl border border-dashed border-amber-200 dark:border-amber-800/40 bg-amber-50/40 dark:bg-amber-900/10">
                             <div class="flex items-center justify-between mb-3">
                                 <div class="flex items-center gap-2">
@@ -275,7 +273,7 @@ const SettingsPage = {
                                         <i data-lucide="gift" class="w-4 h-4 text-white"></i>
                                     </div>
                                     <div>
-                                        <p class="text-sm font-semibold text-gray-800 dark:text-white">Referral Bonus (${UI.currencyCode()})</p>
+                                        <p class="text-sm font-semibold text-gray-800 dark:text-white">Bônus de indicação (${UI.currencyCode()})</p>
                                         <p class="text-xs text-gray-400 dark:text-slate-500">Bonus given to a client who refers a new borrower</p>
                                     </div>
                                 </div>
@@ -289,7 +287,7 @@ const SettingsPage = {
                             <div id="referral-bonus-fields" class="${settings.referral_bonus_enabled === 'true' ? '' : 'hidden'} space-y-3">
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
-                                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Bonus Amount (${UI.currencyCode()})</label>
+                                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Valor do bônus (${UI.currencyCode()})</label>
                                         <div class="flex rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700 focus-within:ring-2 focus-within:ring-amber-400/40 transition">
                                             <span class="flex items-center px-3 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 font-semibold text-sm border-r border-gray-200 dark:border-slate-600 flex-shrink-0">
                                                 ${UI.currencyCode()}
@@ -300,7 +298,7 @@ const SettingsPage = {
                                         </div>
                                     </div>
                                     <div>
-                                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">When to Pay Bonus</label>
+                                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Quando pagar o bônus</label>
                                         <select name="referral_bonus_trigger" class="input select">
                                             <option value="on_loan_creation" ${(settings.referral_bonus_trigger || 'on_loan_creation') === 'on_loan_creation' ? 'selected' : ''}>When new loan is created</option>
                                             <option value="on_first_payment" ${settings.referral_bonus_trigger === 'on_first_payment' ? 'selected' : ''}>After 1st payment of new loan</option>
@@ -317,7 +315,7 @@ const SettingsPage = {
 
                         <div class="p-4 rounded-xl border border-dashed border-red-200 dark:border-red-800/40 bg-red-50/40 dark:bg-red-900/10">
                             <div class="flex items-center justify-between mb-3">
-                                <div><p class="text-sm font-semibold">Automatic Late Penalties</p><p class="text-xs text-gray-400">One idempotent penalty per overdue installment after the grace period.</p></div>
+                                <div><p class="text-sm font-semibold">Multa automática de atraso</p><p class="text-xs text-gray-400">Uma multa por parcela atrasada depois da carência.</p></div>
                                 <label class="apple-toggle"><input type="checkbox" name="auto_penalty_enabled" ${settings.auto_penalty_enabled === 'true' ? 'checked' : ''}><div class="apple-toggle-track"></div></label>
                             </div>
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -328,19 +326,19 @@ const SettingsPage = {
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-primary btn-sm"><i data-lucide="save" class="w-4 h-4"></i> Save Defaults</button>
+                        <button type="submit" class="btn btn-primary btn-sm"><i data-lucide="save" class="w-4 h-4"></i> Salvar padrões</button>
                     </form>
                 </div>
 
                 ${!restrictedDemo ? `<div class="glass-card p-6">
-                    <div class="flex items-center justify-between mb-4"><div><h3 class="text-lg font-bold flex items-center gap-2"><i data-lucide="route" class="w-5 h-5 text-blue-500"></i> Collectors</h3><p class="text-xs text-gray-400">Assign loans and compare collection performance.</p></div><button onclick="SettingsPage.showCollectorForm()" class="btn btn-primary btn-sm"><i data-lucide="plus" class="w-4 h-4"></i> Add</button></div>
-                    <div class="space-y-2">${collectors.length ? collectors.map(c => `<div class="flex items-center justify-between p-3 rounded-xl" style="background:var(--surface-2);"><div><p class="font-semibold text-sm">${c.name}${!c.active ? ' <span class="text-xs text-gray-400">(inactive)</span>' : ''}</p><p class="text-xs text-gray-400">${c.contact || 'No contact'}</p></div><button onclick="SettingsPage.showCollectorFormById(${c.id})" class="btn btn-ghost btn-sm"><i data-lucide="edit-2" class="w-4 h-4"></i></button></div>`).join('') : '<p class="text-sm text-center text-gray-400 py-4">No collectors configured</p>'}</div>
+                    <div class="flex items-center justify-between mb-4"><div><h3 class="text-lg font-bold flex items-center gap-2"><i data-lucide="route" class="w-5 h-5 text-blue-500"></i> Cobradores</h3><p class="text-xs text-gray-400">Associe contratos e compare a cobrança.</p></div><button onclick="SettingsPage.showCollectorForm()" class="btn btn-primary btn-sm"><i data-lucide="plus" class="w-4 h-4"></i> Adicionar</button></div>
+                    <div class="space-y-2">${collectors.length ? collectors.map(c => `<div class="flex items-center justify-between p-3 rounded-xl" style="background:var(--surface-2);"><div><p class="font-semibold text-sm">${c.name}${!c.active ? ' <span class="text-xs text-gray-400">(inativo)</span>' : ''}</p><p class="text-xs text-gray-400">${c.contact || 'Sem telefone'}</p></div><button onclick="SettingsPage.showCollectorFormById(${c.id})" class="btn btn-ghost btn-sm"><i data-lucide="edit-2" class="w-4 h-4"></i></button></div>`).join('') : '<p class="text-sm text-center text-gray-400 py-4">Nenhum cobrador cadastrado</p>'}</div>
                 </div>` : ''}
 
                 <!-- SMS Configuration -->
                 <div class="glass-card p-6">
                     <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-1 flex items-center gap-2">
-                        <i data-lucide="message-square" class="w-5 h-5 text-green-500"></i> SMS & Alerts
+                        <i data-lucide="message-square" class="w-5 h-5 text-green-500"></i> SMS e alertas
                     </h3>
                     <p class="text-sm text-gray-500 dark:text-slate-400 mb-4">
                         Configure automatic SMS sending to overdue clients.
@@ -451,7 +449,7 @@ const SettingsPage = {
                 <!-- Export -->
                 <div class="glass-card p-6">
                     <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
-                        <i data-lucide="download" class="w-5 h-5 text-green-500"></i> Export Data
+                        <i data-lucide="download" class="w-5 h-5 text-green-500"></i> Exportar dados
                     </h3>
                     <p class="text-sm text-gray-500 dark:text-slate-400 mb-4">Choose which data to export. Always includes a Summary sheet with KPIs.</p>
                     <div class="flex flex-wrap gap-3">
@@ -534,7 +532,7 @@ const SettingsPage = {
                                     <i data-lucide="moon" class="w-4 h-4 text-white"></i>
                                 </div>
                                 <div>
-                                    <p class="text-sm font-medium" style="color:var(--text-primary)">Dark Mode</p>
+                                    <p class="text-sm font-medium" style="color:var(--text-primary)">Modo escuro</p>
                                     <p class="text-xs" style="color:var(--text-tertiary)">Toggle interface appearance</p>
                                 </div>
                             </div>
@@ -833,7 +831,7 @@ const SettingsPage = {
                 <div><label class="text-sm font-medium mb-1 block">Contact</label><input name="contact" class="input" value="${collector?.contact || ''}"></div>
                 <div><label class="text-sm font-medium mb-1 block">Notes</label><textarea name="notes" class="input" rows="2">${collector?.notes || ''}</textarea></div>
                 ${collector ? `<label class="flex items-center gap-2 text-sm"><input name="active" type="checkbox" ${collector.active ? 'checked' : ''}> Active collector</label>` : ''}
-                <div class="flex justify-end gap-2"><button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button><button class="btn btn-primary">Save Collector</button></div>
+                <div class="flex justify-end gap-2"><button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button><button class="btn btn-primary">Salvar cobrador</button></div>
             </form>`, { width: 'max-w-md' });
     },
 
@@ -860,7 +858,7 @@ const SettingsPage = {
             { id: 'clients', label: 'Clients', icon: 'users', desc: 'All client profiles (name, contact, income, referrals)' },
             { id: 'loans', label: 'Loans', icon: 'banknote', desc: 'All loans with principal, interest, remaining balance' },
             { id: 'payments', label: 'Payments', icon: 'receipt', desc: 'All payment transactions' },
-            { id: 'amortization', label: 'Amortization Schedule', icon: 'calendar-range', desc: 'Monthly schedule for every loan' },
+            { id: 'amortization', label: 'Carnê / amortização', icon: 'calendar-range', desc: 'Monthly schedule for every loan' },
             { id: 'penalties', label: 'Penalties', icon: 'alert-circle', desc: 'All penalties (pending + resolved)' },
             { id: 'guarantors', label: 'Guarantors', icon: 'users-round', desc: 'Guarantors, co-makers and signatures' },
             { id: 'collateral', label: 'Collateral', icon: 'gem', desc: 'Pledged assets and their status' },
@@ -918,7 +916,7 @@ const SettingsPage = {
                 </div>
 
                 <div class="flex gap-3 justify-end pt-2 border-t border-gray-100 dark:border-slate-700/50">
-                    <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button>
+                    <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button>
                     <button type="button" onclick="SettingsPage.runSelectiveExport()" class="btn btn-success">
                         <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Generate Excel
                     </button>
@@ -1025,7 +1023,7 @@ const SettingsPage = {
                            placeholder="Type RESTORE here" autocomplete="off" spellcheck="false">
                 </div>
                 <div class="flex gap-3 justify-end pt-2" style="border-top:0.5px solid var(--surface-2);">
-                    <button onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button>
+                    <button onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button>
                     <button id="restore-confirm-btn" disabled onclick="SettingsPage._executeRestore()" class="btn"
                             style="background:var(--apple-orange); color:white; opacity:0.5;">
                         <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Restore Backup
@@ -1050,7 +1048,7 @@ const SettingsPage = {
         const select = document.getElementById('restore-backup-select');
         const input = document.getElementById('restore-confirm-input');
         if (!select || !input || input.value !== 'RESTORE') {
-            UI.toast('You must type RESTORE to confirm.', 'warning');
+            UI.toast('You must type RESTORE para confirmar.', 'warning');
             return;
         }
 
@@ -1219,7 +1217,7 @@ const SettingsPage = {
             </button>
         `).join('');
 
-        UI.showModal('Create New Profile', `
+        UI.showModal('Create Novo perfil', `
             <div class="space-y-4">
                 <div>
                     <label class="text-xs font-medium mb-1 block" style="color:var(--text-secondary)">Profile Name *</label>
@@ -1235,7 +1233,7 @@ const SettingsPage = {
                     <input type="hidden" id="new-profile-color" value="#007AFF">
                 </div>
                 <div class="flex gap-3 justify-end pt-2" style="border-top:0.5px solid var(--surface-2);">
-                    <button onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button>
+                    <button onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button>
                     <button onclick="SettingsPage.createProfile()" class="btn btn-primary">
                         <i data-lucide="plus" class="w-4 h-4"></i> Create Profile
                     </button>
@@ -1285,7 +1283,7 @@ const SettingsPage = {
             </button>
         `).join('');
 
-        UI.showModal('Edit Profile', `
+        UI.showModal('Editar ficha', `
             <div class="space-y-4">
                 <div>
                     <label class="text-xs font-medium mb-1 block" style="color:var(--text-secondary)">Profile Name</label>
@@ -1301,7 +1299,7 @@ const SettingsPage = {
                     <input type="hidden" id="edit-profile-color" value="${profile.color || '#007AFF'}">
                 </div>
                 <div class="flex gap-3 justify-end pt-2" style="border-top:0.5px solid var(--surface-2);">
-                    <button onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button>
+                    <button onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button>
                     <button onclick="SettingsPage.saveEditProfile('${profileId}')" class="btn btn-primary">
                         <i data-lucide="save" class="w-4 h-4"></i> Save
                     </button>
@@ -1415,7 +1413,7 @@ const SettingsPage = {
                            oninput="document.getElementById('reset-confirm-btn').disabled = this.value !== 'RESET'">
                 </div>
                 <div class="flex gap-3 justify-end pt-2" style="border-top:0.5px solid var(--surface-2);">
-                    <button onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button>
+                    <button onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button>
                     <button id="reset-confirm-btn" disabled onclick="SettingsPage._executeReset()" class="btn"
                             style="background:var(--apple-red); color:white; opacity:0.5;"
                             onmouseenter="if(!this.disabled) this.style.opacity='1'"
@@ -1444,7 +1442,7 @@ const SettingsPage = {
     async _executeReset() {
         const input = document.getElementById('reset-confirm-input');
         if (!input || input.value !== 'RESET') {
-            UI.toast('You must type RESET to confirm.', 'warning');
+            UI.toast('You must type RESET para confirmar.', 'warning');
             return;
         }
         UI.closeModal();
@@ -1485,7 +1483,7 @@ const SettingsPage = {
                         Wrong password. Try again.
                     </p>
                     <div class="flex gap-3 justify-end pt-2" style="border-top:0.5px solid var(--surface-2);">
-                        <button onclick="UI.closeModal(); SettingsPage._pwResolve && SettingsPage._pwResolve(false);" class="btn btn-ghost">Cancel</button>
+                        <button onclick="UI.closeModal(); SettingsPage._pwResolve && SettingsPage._pwResolve(false);" class="btn btn-ghost">Cancelar</button>
                         <button id="password-check-btn" onclick="SettingsPage._checkPassword()" class="btn btn-primary">
                             <i data-lucide="unlock" class="w-4 h-4"></i> Unlock
                         </button>
@@ -1602,7 +1600,7 @@ const SettingsPage = {
                            onkeydown="if(event.key==='Enter') SettingsPage._savePassword()">
                 </div>
                 <div class="flex gap-3 justify-end pt-2" style="border-top:0.5px solid var(--surface-2);">
-                    <button onclick="UI.closeModal(); SettingsPage._cancelPasswordSetup();" class="btn btn-ghost">Cancel</button>
+                    <button onclick="UI.closeModal(); SettingsPage._cancelPasswordSetup();" class="btn btn-ghost">Cancelar</button>
                     <button onclick="SettingsPage._savePassword()" class="btn btn-primary">
                         <i data-lucide="lock" class="w-4 h-4"></i> Set Password
                     </button>

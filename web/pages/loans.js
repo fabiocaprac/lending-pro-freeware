@@ -1,5 +1,5 @@
 /**
- * Lending Pro Freeware — Loans Page
+ * Prazo Certo — Loans Page
  * List all loans with status filter and create new loans.
  */
 const LoansPage = {
@@ -41,9 +41,9 @@ const LoansPage = {
         const container = document.getElementById('loans-table-container');
 
         if (data.loans.length === 0) {
-            container.innerHTML = UI.emptyState('banknote', 'No Loans Found',
-                this.statusFilter !== 'all' ? 'No loans match this filter.' : 'Create your first loan to get started.',
-                '<button onclick="LoansPage.showCreateForm()" class="btn btn-primary"><i data-lucide="plus" class="w-4 h-4"></i> New Loan</button>'
+            container.innerHTML = UI.emptyState('banknote', 'Nenhum empréstimo encontrado',
+                this.statusFilter !== 'all' ? 'Nenhum contrato neste filtro.' : 'Registre o primeiro empréstimo para começar.',
+                '<button onclick="LoansPage.showCreateForm()" class="btn btn-primary"><i data-lucide="plus" class="w-4 h-4"></i> Novo empréstimo</button>'
             );
             lucide.createIcons();
             return;
@@ -239,7 +239,7 @@ const LoansPage = {
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Interest Type</label>
+                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Tipo de juros</label>
                         <select name="interest_type" class="input select" onchange="LoansPage.previewLoan()">
                             <option value="fixed" ${defaultType === 'fixed' ? 'selected' : ''}>Fixed Rate</option>
                             <option value="declining" ${defaultType === 'declining' ? 'selected' : ''}>Declining Balance</option>
@@ -278,11 +278,11 @@ const LoansPage = {
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Processing Fee (${UI.currencyCode()})</label>
+                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Taxa de cadastro (${UI.currencyCode()})</label>
                         <input name="processing_fee" type="number" min="0" step="0.01" class="input" value="0" oninput="LoansPage.previewLoan()">
                     </div>
                     <div>
-                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Insurance Fee (${UI.currencyCode()})</label>
+                        <label class="text-sm font-medium text-gray-600 dark:text-slate-400 mb-1 block">Seguro (${UI.currencyCode()})</label>
                         <input name="insurance_fee" type="number" min="0" step="0.01" class="input" value="0" oninput="LoansPage.previewLoan()">
                     </div>
                 </div>
@@ -350,7 +350,7 @@ const LoansPage = {
                 </details>
 
                 <div class="flex gap-3 justify-end pt-2">
-                    <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancel</button>
+                    <button type="button" onclick="UI.closeModal()" class="btn btn-ghost">Cancelar</button>
                     <button type="submit" class="btn btn-primary"><i data-lucide="check" class="w-4 h-4"></i> Create Loan</button>
                 </div>
             </form>
@@ -449,7 +449,7 @@ const LoansPage = {
             return;
         }
         UI.closeModal();
-        UI.toast(`Loan #${result.loan_id} created successfully!`, 'success');
+        UI.toast(`Loan #${result.loan_id} cadastrado com sucesso!`, 'success');
         App.navigate('loan_detail', { id: result.loan_id });
     }
 };

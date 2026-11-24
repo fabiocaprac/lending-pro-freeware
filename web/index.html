@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lending Pro Freeware</title>
+    <title>Prazo Certo</title>
 
     <!-- Local Tailwind build. Keep the app usable without Internet. -->
     <link rel="stylesheet" href="vendor/tailwind.css">
@@ -19,47 +19,47 @@
 <body class="h-screen flex" style="background: var(--surface-1); color: var(--text-primary); overflow: clip;">
 
     <!-- ═══ Optional startup login ═══ -->
-    <section id="auth-screen" class="auth-screen" aria-label="Profile login" aria-live="polite">
+    <section id="auth-screen" class="auth-screen" aria-label="Login do perfil" aria-live="polite">
         <div class="auth-orb auth-orb-one"></div>
         <div class="auth-orb auth-orb-two"></div>
         <div class="auth-panel">
             <div class="auth-brand-mark">
-                <img src="assets/lending-pro-mark.png" alt="Lending Pro logo">
+                <img src="assets/lending-pro-mark.png" alt="Logo Prazo Certo">
             </div>
-            <p class="auth-eyebrow">LENDING PRO FREEWARE</p>
-            <h1 id="auth-company-name">Secure local workspace</h1>
-            <p id="auth-profile-name" class="auth-profile-name">Preparing your profile…</p>
+            <p class="auth-eyebrow">PRAZO CERTO</p>
+            <h1 id="auth-company-name">Área de trabalho local</h1>
+            <p id="auth-profile-name" class="auth-profile-name">Preparando o perfil…</p>
 
             <div id="auth-loading" class="auth-loading">
                 <span class="auth-spinner"></span>
-                <span>Opening your private workspace…</span>
+                <span>Abrindo seu workspace privado…</span>
             </div>
 
             <form id="auth-form" class="auth-form hidden" onsubmit="App.submitStartupLogin(event)">
-                <label for="auth-password">Profile password</label>
+                <label for="auth-password">Senha do perfil</label>
                 <div class="auth-input-wrap">
                     <i data-lucide="lock-keyhole" class="w-4 h-4"></i>
                     <input id="auth-password" type="password" autocomplete="current-password"
-                           placeholder="Enter your password" spellcheck="false">
-                    <button type="button" onclick="App.toggleLoginPassword()" aria-label="Show or hide password">
+                           placeholder="Digite sua senha" spellcheck="false">
+                    <button type="button" onclick="App.toggleLoginPassword()" aria-label="Mostrar ou ocultar senha">
                         <i id="auth-password-icon" data-lucide="eye" class="w-4 h-4"></i>
                     </button>
                 </div>
                 <p id="auth-error" class="auth-error hidden" role="alert"></p>
                 <button id="auth-submit" type="submit" class="auth-submit">
                     <i data-lucide="unlock" class="w-4 h-4"></i>
-                    <span>Unlock workspace</span>
+                    <span>Desbloquear</span>
                 </button>
             </form>
 
             <div id="auth-load-error" class="auth-load-error hidden">
-                <p>Security settings could not be loaded.</p>
-                <button type="button" onclick="App.retryStartupAuthentication()">Try again</button>
+                <p>Não foi possível carregar as configurações de segurança.</p>
+                <button type="button" onclick="App.retryStartupAuthentication()">Tentar de novo</button>
             </div>
 
             <div class="auth-footer">
-                <span><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Offline protection</span>
-                <button type="button" onclick="App._doQuit()">Quit</button>
+                <span><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Proteção offline</span>
+                <button type="button" onclick="App._doQuit()">Sair</button>
             </div>
         </div>
     </section>
@@ -67,7 +67,7 @@
     <!-- ═══ Offline Banner ═══ -->
     <div id="offline-banner" class="offline-banner fixed top-0 left-0 right-0 z-50 hidden">
         <i data-lucide="wifi-off" class="w-4 h-4"></i>
-        <span>Offline Mode — Cloud backups are unavailable</span>
+        <span>Modo offline — backups na nuvem indisponíveis</span>
     </div>
 
     <!-- ═══ Mobile Overlay ═══ -->
@@ -76,73 +76,73 @@
     <!-- ═══ Sidebar — macOS style ═══ -->
     <aside id="sidebar" class="sidebar w-60 h-screen flex flex-col flex-shrink-0 z-30">
 
-        <!-- Logo + Company Name -->
+        <!-- Logo + Nome da empresa -->
         <div class="px-4 py-4 flex items-center gap-3 min-h-[64px]"
             style="border-bottom: 0.5px solid rgba(0,0,0,0.07);">
             <div class="w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0 transition-all duration-300"
                 id="sidebar-logo"
                 style="background: #071b3a; box-shadow: 0 2px 6px rgba(0,0,0,0.18);">
-                <img src="assets/lending-pro-mark.png" class="w-full h-full object-cover" alt="Lending Pro">
+                <img src="assets/lending-pro-mark.png" class="w-full h-full object-cover" alt="Prazo Certo">
             </div>
             <div class="min-w-0 flex-1">
                 <h1 id="sidebar-company-name" class="text-[14px] font-bold truncate leading-tight"
-                    style="color: var(--text-primary);">Lending Pro</h1>
-                <p class="text-[10px] font-medium tracking-widest uppercase" style="color: var(--text-tertiary);">Freeware
+                    style="color: var(--text-primary);">Prazo Certo</h1>
+                <p class="text-[10px] font-medium tracking-widest uppercase" style="color: var(--text-tertiary);">Crediário
                 </p>
             </div>
         </div>
 
         <!-- Navigation -->
         <nav class="flex-1 px-2 py-3 space-y-0.5 overflow-y-auto">
-            <p class="section-title px-3 pt-1 pb-2">Main</p>
+            <p class="section-title px-3 pt-1 pb-2">Principal</p>
             <a class="sidebar-link active" data-page="dashboard" onclick="App.navigate('dashboard')">
                 <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
-                <span>Dashboard</span>
+                <span>Painel</span>
             </a>
             <a class="sidebar-link" data-page="clients" onclick="App.navigate('clients')">
                 <i data-lucide="users" class="w-4 h-4"></i>
-                <span>Clients</span>
+                <span>Clientes</span>
             </a>
             <a class="sidebar-link" data-page="loans" onclick="App.navigate('loans')">
                 <i data-lucide="banknote" class="w-4 h-4"></i>
-                <span>Loans</span>
+                <span>Empréstimos</span>
             </a>
             <a class="sidebar-link" data-page="payments" onclick="App.navigate('payments')">
                 <i data-lucide="receipt" class="w-4 h-4"></i>
-                <span>Payments</span>
+                <span>Pagamentos</span>
             </a>
             <a class="sidebar-link" data-page="calendar" onclick="App.navigate('calendar')">
                 <i data-lucide="calendar-check" class="w-4 h-4"></i>
-                <span>Collections</span>
+                <span>Cobrança</span>
             </a>
             <a class="sidebar-link" data-page="alerts" onclick="App.navigate('alerts')">
                 <i data-lucide="bell-ring" class="w-4 h-4"></i>
-                <span>Alerts</span>
+                <span>Alertas</span>
                 <span id="alerts-badge" class="hidden ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full"
                     style="background: #FF3B30; color: white; min-width: 18px; text-align: center;"></span>
             </a>
             <a class="sidebar-link" data-page="commissions" onclick="App.navigate('commissions')">
                 <i data-lucide="gift" class="w-4 h-4"></i>
-                <span>Referrals</span>
+                <span>Indicações</span>
             </a>
 
             <div style="height: 0.5px; background: rgba(0,0,0,0.07); margin: 10px 8px;"></div>
-            <p class="section-title px-3 pb-1">System</p>
+            <p class="section-title px-3 pb-1">Sistema</p>
             <a class="sidebar-link" data-page="settings" onclick="App.navigate('settings')">
                 <i data-lucide="settings-2" class="w-4 h-4"></i>
-                <span>Settings</span>
+                <span>Configurações</span>
             </a>
             <a class="sidebar-link" data-page="help" onclick="App.navigate('help')">
                 <i data-lucide="book-open" class="w-4 h-4"></i>
-                <span>Help &amp; Guide</span>
+                <span>Ajuda</span>
             </a>
             <a class="sidebar-link" data-page="about" onclick="App.navigate('about')">
                 <i data-lucide="info" class="w-4 h-4"></i>
-                <span>About</span>
+                <span>Sobre</span>
             </a>
             <a class="sidebar-link" data-page="logs" onclick="App.navigate('logs')" title="Error and event log">
                 <i data-lucide="scroll-text" class="w-4 h-4"></i>
-                <span>System Logs</span>
+                <span>Registros</span>
             </a>
         </nav>
 
@@ -150,19 +150,19 @@
         <div class="px-2 pb-3 space-y-0.5" style="border-top: 0.5px solid rgba(0,0,0,0.07); padding-top: 8px;">
             <button onclick="App.toggleTheme()" class="sidebar-link w-full" id="theme-toggle-btn">
                 <i data-lucide="moon" class="w-4 h-4" id="theme-icon"></i>
-                <span id="theme-label">Dark Mode</span>
+                <span id="theme-label">Modo escuro</span>
             </button>
             <button onclick="App.lockSession()" class="sidebar-link w-full hidden" id="lock-session-btn">
                 <i data-lucide="lock-keyhole" class="w-4 h-4"></i>
-                <span>Lock Session</span>
+                <span>Bloquear sessão</span>
             </button>
             <button onclick="App.quitApp()" class="sidebar-link w-full" style="color: var(--apple-red); opacity: 0.75;"
                 onmouseenter="this.style.opacity='1'; this.style.background='rgba(255,59,48,0.08)'"
                 onmouseleave="this.style.opacity='0.75'; this.style.background=''">
                 <i data-lucide="power" class="w-4 h-4"></i>
-                <span>Quit App</span>
+                <span>Sair</span>
             </button>
-            <p id="sidebar-version" class="text-[10px] text-center pt-1" style="color: var(--text-tertiary);">v1.5.1 - Lending Pro Freeware</p>
+            <p id="sidebar-version" class="text-[10px] text-center pt-1" style="color: var(--text-tertiary);">v1.5.1 — Prazo Certo</p>
         </div>
     </aside>
 
@@ -178,9 +178,9 @@
                 </button>
                 <div>
                     <h2 id="page-title" class="text-[17px] font-semibold leading-tight"
-                        style="color: var(--text-primary);">Dashboard</h2>
+                        style="color: var(--text-primary);">Painel</h2>
                     <p id="page-subtitle" class="text-[11px] hidden sm:block" style="color: var(--text-tertiary);">
-                        Overview of your lending portfolio</p>
+                        Visão geral da carteira de crediário</p>
                 </div>
             </div>
             <div class="toolbar-actions flex items-center gap-2 min-w-0">
@@ -190,16 +190,16 @@
                     style="background: rgba(0,122,255,0.10); color: var(--accent);">
                     <div class="w-1.5 h-1.5 rounded-full animate-pulse" style="background: var(--accent);"
                         id="autosave-dot"></div>
-                    <span id="autosave-text">Saving…</span>
+                    <span id="autosave-text">Salvando…</span>
                 </div>
 
                 <!-- Demo is opt-in and kept away from the page title. -->
                 <button id="demo-mode-btn" onclick="App.requestDemoMode()"
                     class="hidden btn btn-sm items-center gap-1.5 justify-center"
                     style="background:rgba(255,149,0,0.12); color:#B86700; border:1px solid rgba(255,149,0,0.28);"
-                    title="Try demo mode">
+                    title="Testar modo demo">
                     <i id="demo-mode-icon" data-lucide="flask-conical" class="w-3.5 h-3.5"></i>
-                    <span id="demo-mode-label">Try demo</span>
+                    <span id="demo-mode-label">Testar demo</span>
                 </button>
 
                 <!-- Online status -->
@@ -211,20 +211,20 @@
 
                 <!-- Sounds quick toggle -->
                 <button onclick="App.quickToggleSound()" id="sound-btn" class="toolbar-secondary btn btn-icon btn-ghost"
-                    title="Toggle sounds">
+                    title="Ligar ou desligar sons">
                     <i data-lucide="volume-2" class="w-4 h-4" id="sound-icon"></i>
                 </button>
 
-                <button onclick="App.toggleCalculator()" class="btn btn-icon btn-ghost" title="Calculator">
+                <button onclick="App.toggleCalculator()" class="btn btn-icon btn-ghost" title="Calculadora">
                     <i data-lucide="calculator" class="w-4 h-4"></i>
                 </button>
                 <button onclick="PrintManager.smartPrint()" id="print-btn" class="toolbar-secondary btn btn-icon btn-ghost"
-                    title="Print / Preview">
+                    title="Imprimir / visualizar">
                     <i data-lucide="printer" class="w-4 h-4"></i>
                 </button>
                 <button onclick="App.showQuickActions()" class="toolbar-new btn btn-primary btn-sm flex items-center gap-1.5">
                     <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                    <span>New</span>
+                    <span>Novo</span>
                 </button>
             </div>
         </header>
@@ -292,20 +292,20 @@
                         <i data-lucide="file-text" class="w-4 h-4 text-white"></i>
                     </div>
                     <div>
-                        <p id="pdf-viewer-title" class="text-white font-semibold text-sm leading-tight">Document</p>
-                        <p id="pdf-viewer-subtitle" class="text-white/60 text-xs">Preview</p>
+                        <p id="pdf-viewer-title" class="text-white font-semibold text-sm leading-tight">Documento</p>
+                        <p id="pdf-viewer-subtitle" class="text-white/60 text-xs">Pré-visualização</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button onclick="PrintManager.printCurrentPdf()" class="pdf-viewer-btn" title="Print">
+                    <button onclick="PrintManager.printCurrentPdf()" class="pdf-viewer-btn" title="Imprimir">
                         <i data-lucide="printer" class="w-4 h-4"></i>
-                        <span class="hidden sm:inline">Print</span>
+                        <span class="hidden sm:inline">Imprimir</span>
                     </button>
-                    <button onclick="PrintManager.downloadCurrentPdf()" class="pdf-viewer-btn" title="Download">
+                    <button onclick="PrintManager.downloadCurrentPdf()" class="pdf-viewer-btn" title="Abrir">
                         <i data-lucide="download" class="w-4 h-4"></i>
-                        <span class="hidden sm:inline">Open</span>
+                        <span class="hidden sm:inline">Abrir</span>
                     </button>
-                    <button onclick="PrintManager.closePdfViewer()" class="pdf-viewer-close" title="Close">
+                    <button onclick="PrintManager.closePdfViewer()" class="pdf-viewer-close" title="Fechar">
                         <i data-lucide="x" class="w-5 h-5"></i>
                     </button>
                 </div>
@@ -313,7 +313,7 @@
             <div class="pdf-viewer-body">
                 <div id="pdf-viewer-loading" class="pdf-viewer-loading">
                     <div class="pdf-spinner"></div>
-                    <p class="text-white/70 mt-3 text-sm">Generating PDF…</p>
+                    <p class="text-white/70 mt-3 text-sm">Gerando PDF…</p>
                 </div>
                 <iframe id="pdf-viewer-frame" class="pdf-viewer-frame hidden" title="PDF Preview"></iframe>
             </div>
